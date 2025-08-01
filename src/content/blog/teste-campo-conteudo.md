@@ -1,7 +1,7 @@
 ---
 title: 'Teste do Campo de Conteúdo'
 description: 'Post criado para testar se o campo de conteúdo está funcionando na interface admin'
-pubDate: 'Jan 15, 2025'
+pubDate: 'Jan 15, 2024'
 ---
 
 # Teste do Campo de Conteúdo

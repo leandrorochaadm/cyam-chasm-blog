@@ -1,22 +1,29 @@
 ---
-title: 'aaaa'
-description: 'Lorem ipsum dolor sit amet'
-pubDate: 'Jul 28, 2025'
-updatedDate: 'Jul 29, 2025'
+title: 'Post de Teste'
+description: 'Post temporário criado para testes de desenvolvimento'
+pubDate: 'Jan 15, 2024'
+updatedDate: 'Jan 16, 2024'
 heroImage: '../../assets/1754052626483-Arte_Tio_Zito.webp'
 ---
 
-fdsafs
+# Post de Teste
 
-# asdfdf
+Este é um post temporário criado para testes de desenvolvimento.
 
-> 51165141
+## Conteúdo de Exemplo
 
-fdsfasdfd  
-asdfads
+Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
 
-\`\`\`html
+### Código de Exemplo
 
-# titlte
-
-\`\`\`
+```html
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Título de Exemplo</title>
+</head>
+<body>
+    <h1>Olá, mundo!</h1>
+</body>
+</html>
+```
