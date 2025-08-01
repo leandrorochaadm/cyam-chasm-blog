@@ -299,8 +299,9 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 								</div>
 							</div>
 							<div class="help-text">
-								Selecione uma imagem do seu computador ou digite
-								o caminho manualmente (opcional)
+								Selecione uma imagem do seu computador (será
+								automaticamente otimizada e convertida para
+								WebP) ou digite o caminho manualmente (opcional)
 							</div>
 						</div>
 
@@ -648,7 +649,14 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 						if (result.success) {
 							// Atualizar o campo heroImage com o caminho da imagem
 							heroImageInput.value = result.path;
-							uploadStatus.textContent = `✅ ${result.filename}`;
+
+							// Mostrar informações de otimização
+							const optimization = result.optimization;
+							uploadStatus.innerHTML = `
+								✅ <strong>${result.filename}</strong><br>
+								📦 ${optimization.originalSize} → ${optimization.optimizedSize} 
+								(${optimization.reduction} menor)
+							`;
 							uploadStatus.className = "upload-status success";
 						} else {
 							throw new Error(result.message);

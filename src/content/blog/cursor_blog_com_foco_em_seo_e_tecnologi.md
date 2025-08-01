@@ -1,9 +1,9 @@
 ---
 title: 'Blog com foco em SEO e tecnologias modernas'
 description: 'Lorem ipsum dolor sit amet'
-pubDate: 'Jul 29, 2025'
-updatedDate: 'Jul 29, 2025'
-heroImage: '../../assets/1754009867610-convite_casamento.jpeg'
+pubDate: 'Jul 8, 2025'
+updatedDate: 'Jul 8, 2025'
+heroImage: '../../assets/1754045395241-convite_casamento.webp'
 ---
 
 *Exported on 31/07/2025 at 12:42:42 BRT from Cursor (1.3.6)*
