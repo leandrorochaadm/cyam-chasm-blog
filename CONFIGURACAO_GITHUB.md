@@ -16,6 +16,15 @@ Este projeto agora usa a GitHub API para permitir edição de posts diretamente 
 
 ## 🔧 Configuração
 
+### ⚠️ IMPORTANTE: Carregamento de Variáveis de Ambiente
+
+O Astro pode não carregar automaticamente as variáveis do arquivo `.env.local`. Se isso acontecer, use o comando:
+
+```bash
+# Para desenvolvimento local
+set -a && source .env.local && set +a && npm run dev
+```
+
 ### 1. Criar GitHub Personal Access Token
 
 1. Vá para: https://github.com/settings/tokens/new
