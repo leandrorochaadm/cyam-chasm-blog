@@ -255,6 +255,39 @@ try {
 				font-size: 0.875rem;
 				color: #6c757d;
 			}
+
+			.image-upload-container {
+				display: flex;
+				flex-direction: column;
+				gap: 0.5rem;
+			}
+
+			.upload-section {
+				display: flex;
+				align-items: center;
+				gap: 1rem;
+			}
+
+			.upload-btn {
+				white-space: nowrap;
+			}
+
+			.upload-status {
+				font-size: 0.875rem;
+				font-weight: 500;
+			}
+
+			.upload-status.success {
+				color: #28a745;
+			}
+
+			.upload-status.error {
+				color: #dc3545;
+			}
+
+			.upload-status.loading {
+				color: #6c757d;
+			}
 		</style>
 	</head>
 	<body>
@@ -365,16 +398,38 @@ try {
 							<label for="heroImage" class="form-label"
 								>Imagem de Destaque</label
 							>
-							<input
-								type="text"
-								id="heroImage"
-								name="heroImage"
-								class="form-input"
-								value={originalHeroImage || ""}
-								placeholder="../../assets/blog-placeholder-1.jpg"
-							/>
+							<div class="image-upload-container">
+								<input
+									type="text"
+									id="heroImage"
+									name="heroImage"
+									class="form-input"
+									value={originalHeroImage || ""}
+									placeholder="../../assets/blog-placeholder-1.jpg"
+									readonly
+								/>
+								<div class="upload-section">
+									<input
+										type="file"
+										id="imageUpload"
+										accept="image/jpeg,image/jpg,image/png,image/webp"
+										style="display: none;"
+									/>
+									<button
+										type="button"
+										id="selectImageBtn"
+										class="btn btn-secondary upload-btn"
+									>
+										📁 Selecionar Imagem
+									</button>
+									<span
+										id="uploadStatus"
+										class="upload-status"></span>
+								</div>
+							</div>
 							<div class="help-text">
-								Caminho relativo para a imagem (opcional)
+								Selecione uma imagem do seu computador ou digite
+								o caminho manualmente (opcional)
 							</div>
 						</div>
 
@@ -711,6 +766,55 @@ try {
 						</body>
 					</html>
 				`);
+				});
+
+			// Funcionalidade de upload de imagem
+			document
+				.getElementById("selectImageBtn")
+				.addEventListener("click", () => {
+					document.getElementById("imageUpload").click();
+				});
+
+			document
+				.getElementById("imageUpload")
+				.addEventListener("change", async (e) => {
+					const file = e.target.files[0];
+					if (!file) return;
+
+					const uploadStatus =
+						document.getElementById("uploadStatus");
+					const heroImageInput = document.getElementById("heroImage");
+
+					// Mostrar status de carregamento
+					uploadStatus.textContent = "Fazendo upload...";
+					uploadStatus.className = "upload-status loading";
+
+					try {
+						const formData = new FormData();
+						formData.append("image", file);
+
+						const response = await fetch("/api/upload-image", {
+							method: "POST",
+							body: formData,
+						});
+
+						const result = await response.json();
+
+						if (result.success) {
+							// Atualizar o campo heroImage com o caminho da imagem
+							heroImageInput.value = result.path;
+							uploadStatus.textContent = `✅ ${result.filename}`;
+							uploadStatus.className = "upload-status success";
+						} else {
+							throw new Error(result.message);
+						}
+					} catch (error) {
+						uploadStatus.textContent = `❌ ${error.message}`;
+						uploadStatus.className = "upload-status error";
+					}
+
+					// Limpar o input file para permitir nova seleção
+					e.target.value = "";
 				});
 		</script>
 	</body>
