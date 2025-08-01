@@ -2,10 +2,15 @@
 
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
+import node from '@astrojs/node';
 import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
+	output: 'server',
+	adapter: node({
+		mode: 'standalone'
+	}),
 	site: 'https://example.com',
 	integrations: [
 		mdx(),
@@ -15,41 +20,6 @@ export default defineConfig({
 			lastmod: new Date(),
 		}),
 	],
-
-	// Otimizações de performance
-	build: {
-		assets: 'assets',
-		inlineStylesheets: 'auto',
-	},
-
-	// Otimizações de imagem
-	image: {
-		domains: ['example.com'],
-		remotePatterns: [{ protocol: 'https' }],
-	},
-
-	// Compressão e otimização
-	vite: {
-		build: {
-			cssCodeSplit: true,
-			rollupOptions: {
-				output: {
-					assetFileNames: (assetInfo) => {
-						let extType = assetInfo.name.split('.').at(1);
-						if (/png|jpe?g|svg|gif|tiff|bmp|ico/i.test(extType)) {
-							extType = 'img';
-						}
-						return `assets/${extType}/[name]-[hash][extname]`;
-					},
-					chunkFileNames: 'assets/js/[name]-[hash].js',
-					entryFileNames: 'assets/js/[name]-[hash].js',
-				},
-			},
-		},
-		css: {
-			devSourcemap: true,
-		},
-	},
 
 	// Configurações de desenvolvimento
 	server: {
