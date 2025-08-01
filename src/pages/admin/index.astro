@@ -1,8 +1,8 @@
 ---
 import { getCollection } from "astro:content";
-import BaseHead from "../../components/BaseHead.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Card from "../../components/ui/Card.astro";
+import Button from "../../components/ui/Button.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 import FormattedDate from "../../components/FormattedDate.astro";
 
@@ -11,250 +11,300 @@ const posts = (await getCollection("blog")).sort(
 );
 ---
 
-<!doctype html>
-<html lang="pt-br">
-	<head>
-		<BaseHead
-			title={`Admin - ${SITE_TITLE}`}
-			description={SITE_DESCRIPTION}
-		/>
-		<style>
-			.admin-container {
-				max-width: 1200px;
-				margin: 0 auto;
-				padding: 2rem;
-			}
+<BaseLayout
+	title={`Admin - ${SITE_TITLE}`}
+	description={SITE_DESCRIPTION}
+	class="admin-page"
+>
+	<section class="admin-header">
+		<div class="admin-header-content">
+			<h1 class="admin-title">Administração do Blog</h1>
+			<Button href="/admin/create" variant="primary">
+				+ Criar Novo Post
+			</Button>
+		</div>
+	</section>
 
-			.admin-header {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-bottom: 2rem;
-				padding-bottom: 1rem;
-				border-bottom: 2px solid #e1e5e9;
-			}
+	{
+		posts.length === 0 ? (
+			<section class="no-posts">
+				<Card variant="outlined" padding="lg" class="no-posts-card">
+					<h3>Nenhum post encontrado</h3>
+					<p>Comece criando seu primeiro post!</p>
+					<Button href="/admin/create" variant="primary">
+						Criar Primeiro Post
+					</Button>
+				</Card>
+			</section>
+		) : (
+			<section class="posts-grid">
+				{posts.map((post) => (
+					<Card variant="elevated" padding="lg" class="post-card">
+						<h3 class="post-title">{post.data.title}</h3>
+						<p class="post-description">{post.data.description}</p>
+						<div class="post-meta">
+							<span>
+								Publicado:{" "}
+								<FormattedDate date={post.data.pubDate} />
+							</span>
+							{post.data.updatedDate && (
+								<span>
+									Atualizado:{" "}
+									<FormattedDate
+										date={post.data.updatedDate}
+									/>
+								</span>
+							)}
+						</div>
+						<div class="post-actions">
+							<Button
+								href={`/blog/${post.id}`}
+								variant="ghost"
+								size="sm"
+							>
+								Ver Post
+							</Button>
+							<Button
+								href={`/admin/edit/${post.id}`}
+								variant="primary"
+								size="sm"
+							>
+								Editar
+							</Button>
+							<button
+								class="btn btn--danger btn--sm delete-btn"
+								data-post-id={post.id}
+								data-post-title={post.data.title}
+								type="button"
+							>
+								Deletar
+							</button>
+						</div>
+					</Card>
+				))}
+			</section>
+		)
+	}
+</BaseLayout>
 
-			.admin-title {
-				font-size: 2.5rem;
-				font-weight: bold;
-				color: #2c3e50;
-			}
+<style>
+	.admin-page {
+		padding-top: var(--space-4);
+	}
 
-			.btn {
-				display: inline-block;
-				padding: 0.75rem 1.5rem;
-				border-radius: 8px;
-				text-decoration: none;
-				font-weight: 600;
-				transition: all 0.3s ease;
-				border: none;
-				cursor: pointer;
-			}
+	/* Admin Header */
+	.admin-header {
+		text-align: center;
+		margin-bottom: var(--space-12);
+	}
 
-			.btn-primary {
-				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-				color: white;
-			}
+	.admin-header-content {
+		max-width: 1000px;
+		margin: 0 auto;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: var(--space-6);
+		border-bottom: var(--border-width-2) solid var(--color-neutral-300);
+	}
 
-			.btn-primary:hover {
-				transform: translateY(-2px);
-				box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-			}
+	.admin-title {
+		font-size: clamp(var(--font-size-3xl), 5vw, var(--font-size-4xl));
+		font-weight: var(--font-weight-extrabold);
+		color: var(--color-neutral-900);
+		margin: 0;
+		line-height: var(--line-height-tight);
+	}
 
-			.btn-secondary {
-				background: #f8f9fa;
-				color: #495057;
-				border: 1px solid #dee2e6;
-			}
+	/* Posts Grid */
+	.posts-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+		gap: var(--space-6);
+		max-width: 1200px;
+		margin: 0 auto;
+	}
 
-			.btn-secondary:hover {
-				background: #e9ecef;
-			}
+	.post-card {
+		transition: var(--transition-all);
+	}
 
-			.btn-danger {
-				background: #dc3545;
-				color: white;
-			}
+	.post-title {
+		font-size: var(--font-size-xl);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-neutral-900);
+		margin-bottom: var(--space-2);
+		line-height: var(--line-height-tight);
+	}
 
-			.btn-danger:hover {
-				background: #c82333;
-			}
+	.post-description {
+		color: var(--color-neutral-700);
+		margin-bottom: var(--space-4);
+		line-height: var(--line-height-relaxed);
+	}
 
-			.posts-grid {
-				display: grid;
-				grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-				gap: 1.5rem;
-				margin-top: 2rem;
-			}
+	.post-meta {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-1);
+		margin-bottom: var(--space-4);
+		font-size: var(--font-size-sm);
+		color: var(--color-neutral-600);
+	}
 
-			.post-card {
-				background: white;
-				border-radius: 12px;
-				padding: 1.5rem;
-				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-				transition:
-					transform 0.3s ease,
-					box-shadow 0.3s ease;
-				border: 1px solid #e1e5e9;
-			}
+	.post-actions {
+		display: flex;
+		gap: var(--space-2);
+		flex-wrap: wrap;
+	}
 
-			.post-card:hover {
-				transform: translateY(-5px);
-				box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-			}
+	/* Botões inline */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-2);
+		border: var(--border-width-1) solid transparent;
+		border-radius: var(--border-radius-lg);
+		font-family: var(--font-family-primary);
+		font-weight: var(--font-weight-medium);
+		text-decoration: none;
+		text-align: center;
+		cursor: pointer;
+		transition: var(--transition-all);
+		white-space: nowrap;
+		user-select: none;
+		position: relative;
+		overflow: hidden;
+	}
 
-			.post-title {
-				font-size: 1.25rem;
-				font-weight: 600;
-				margin-bottom: 0.5rem;
-				color: #2c3e50;
-			}
+	.btn--sm {
+		padding: var(--space-2) var(--space-3);
+		font-size: var(--font-size-sm);
+		min-height: 2rem;
+	}
 
-			.post-description {
-				color: #6c757d;
-				margin-bottom: 1rem;
-				line-height: 1.5;
-			}
+	.btn--danger {
+		background: linear-gradient(
+			135deg,
+			var(--color-error-500) 0%,
+			var(--color-error-600) 100%
+		);
+		color: white;
+		box-shadow: var(--shadow-sm);
+	}
 
-			.post-meta {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-bottom: 1rem;
-				font-size: 0.875rem;
-				color: #6c757d;
-			}
+	.btn--danger:hover:not(:disabled) {
+		background: linear-gradient(
+			135deg,
+			var(--color-error-600) 0%,
+			var(--color-error-700) 100%
+		);
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-md);
+	}
 
-			.post-actions {
-				display: flex;
-				gap: 0.5rem;
-			}
+	/* No Posts */
+	.no-posts {
+		text-align: center;
+		max-width: 600px;
+		margin: var(--space-12) auto;
+	}
 
-			.btn-sm {
-				padding: 0.5rem 1rem;
-				font-size: 0.875rem;
-			}
+	.no-posts-card {
+		text-align: center;
+	}
 
-			.no-posts {
-				text-align: center;
-				padding: 4rem 2rem;
-				color: #6c757d;
-			}
+	.no-posts h3 {
+		color: var(--color-neutral-900);
+		font-size: var(--font-size-2xl);
+		margin-bottom: var(--space-4);
+	}
 
-			.no-posts h3 {
-				font-size: 1.5rem;
-				margin-bottom: 1rem;
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<div class="admin-container">
-				<div class="admin-header">
-					<h1 class="admin-title">Administração do Blog</h1>
-					<a href="/admin/create" class="btn btn-primary">
-						+ Criar Novo Post
-					</a>
-				</div>
-			</div>
+	.no-posts p {
+		color: var(--color-neutral-600);
+		font-size: var(--font-size-lg);
+		margin-bottom: var(--space-6);
+	}
 
-			{
-				posts.length === 0 ? (
-					<div class="no-posts">
-						<h3>Nenhum post encontrado</h3>
-						<p>Comece criando seu primeiro post!</p>
-						<a href="/admin/create" class="btn btn-primary">
-							Criar Primeiro Post
-						</a>
-					</div>
-				) : (
-					<div class="posts-grid">
-						{posts.map((post) => (
-							<article class="post-card">
-								<h3 class="post-title">{post.data.title}</h3>
-								<p class="post-description">
-									{post.data.description}
-								</p>
-								<div class="post-meta">
-									<span>
-										Publicado:{" "}
-										<FormattedDate
-											date={post.data.pubDate}
-										/>
-									</span>
-									{post.data.updatedDate && (
-										<span>
-											Atualizado:{" "}
-											<FormattedDate
-												date={post.data.updatedDate}
-											/>
-										</span>
-									)}
-								</div>
-								<div class="post-actions">
-									<a
-										href={`/blog/${post.id}`}
-										class="btn btn-secondary btn-sm"
-									>
-										Ver Post
-									</a>
-									<a
-										href={`/admin/edit/${post.id}`}
-										class="btn btn-primary btn-sm"
-									>
-										Editar
-									</a>
-									<button
-										class="btn btn-danger btn-sm delete-btn"
-										data-post-id={post.id}
-										data-post-title={post.data.title}
-									>
-										Deletar
-									</button>
-								</div>
-							</article>
-						))}
-					</div>
-				)
-			}
-		</main>
+	/* Dark mode */
+	@media (prefers-color-scheme: dark) {
+		.admin-header-content {
+			border-bottom-color: var(--color-neutral-400);
+		}
 
-		<Footer />
+		.admin-title {
+			color: var(--color-neutral-900);
+		}
 
-		<script>
-			// Confirmar deleção de posts
-			document.querySelectorAll(".delete-btn").forEach((btn) => {
-				btn.addEventListener("click", async (e) => {
-					const postId = e.target.dataset.postId;
-					const postTitle = e.target.dataset.postTitle;
+		.post-title {
+			color: var(--color-neutral-900);
+		}
 
-					if (
-						confirm(
-							`Tem certeza que deseja deletar o post "${postTitle}"?`,
-						)
-					) {
-						try {
-							const response = await fetch(
-								`/api/posts/${postId}`,
-								{
-									method: "DELETE",
-								},
-							);
+		.post-description {
+			color: var(--color-neutral-800);
+		}
 
-							if (response.ok) {
-								location.reload();
-							} else {
-								alert(
-									"Erro ao deletar o post. Tente novamente.",
-								);
-							}
-						} catch (error) {
-							alert("Erro ao deletar o post. Tente novamente.");
-						}
+		.post-meta {
+			color: var(--color-neutral-600);
+		}
+
+		.no-posts h3 {
+			color: var(--color-neutral-900);
+		}
+
+		.no-posts p {
+			color: var(--color-neutral-700);
+		}
+	}
+
+	/* Responsividade */
+	@media (max-width: 768px) {
+		.admin-header-content {
+			flex-direction: column;
+			gap: var(--space-4);
+			text-align: center;
+		}
+
+		.posts-grid {
+			grid-template-columns: 1fr;
+			gap: var(--space-4);
+		}
+
+		.post-actions {
+			flex-direction: column;
+		}
+
+		.post-meta {
+			gap: var(--space-2);
+		}
+	}
+</style>
+
+<script>
+	// Confirmar deleção de posts
+	document.querySelectorAll(".delete-btn").forEach((btn) => {
+		btn.addEventListener("click", async (e) => {
+			const postId = e.target.dataset.postId;
+			const postTitle = e.target.dataset.postTitle;
+
+			if (
+				confirm(`Tem certeza que deseja deletar o post "${postTitle}"?`)
+			) {
+				try {
+					const response = await fetch(`/api/posts/${postId}`, {
+						method: "DELETE",
+					});
+
+					if (response.ok) {
+						location.reload();
+					} else {
+						alert("Erro ao deletar o post. Tente novamente.");
 					}
-				});
-			});
-		</script>
-	</body>
-</html>
+				} catch (error) {
+					alert("Erro ao deletar o post. Tente novamente.");
+				}
+			}
+		});
+	});
+</script>

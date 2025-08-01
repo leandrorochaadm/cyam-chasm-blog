@@ -1,49 +1,342 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import BaseLayout from "../layouts/BaseLayout.astro";
+import Button from "../components/ui/Button.astro";
+import Card from "../components/ui/Card.astro";
+import { SITE_DESCRIPTION, SITE_TITLE } from "../consts";
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
+<BaseLayout title={SITE_TITLE} description={SITE_DESCRIPTION} class="homepage">
+	<section class="hero">
+		<div class="hero-content">
+			<h1 class="hero-title">
+				<span class="hero-emoji">🧑‍🚀</span>
+				Bem-vindo ao Astro Blog!
+			</h1>
+			<p class="hero-description">
+				Um template moderno e otimizado para blog, construído com <a
+					href="https://astro.build/">Astro</a
+				>. Lightweight, rápido e totalmente customizável para suas
+				necessidades.
 			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
+			<div class="hero-actions">
+				<Button href="/blog" variant="primary" size="lg">
+					Explorar Posts
+				</Button>
+				<Button href="/about" variant="secondary" size="lg">
+					Sobre o Blog
+				</Button>
+			</div>
+		</div>
+	</section>
+
+	<section class="features">
+		<div class="features-grid">
+			<Card variant="elevated" padding="lg">
+				<h3>⚡ Performance</h3>
+				<p>
+					Otimizado para velocidade com carregamento rápido,
+					compressão de assets e lazy loading de imagens.
+				</p>
+			</Card>
+
+			<Card variant="elevated" padding="lg">
+				<h3>🎨 Design Moderno</h3>
+				<p>
+					Sistema de design consistente com tokens CSS, modo escuro
+					automático e componentes reutilizáveis.
+				</p>
+			</Card>
+
+			<Card variant="elevated" padding="lg">
+				<h3>📱 Responsivo</h3>
+				<p>
+					Interface adaptativa que funciona perfeitamente em todos os
+					dispositivos e tamanhos de tela.
+				</p>
+			</Card>
+
+			<Card variant="elevated" padding="lg">
+				<h3>🔍 SEO Otimizado</h3>
+				<p>
+					Meta tags avançadas, Schema.org, sitemap automático e
+					otimizações para mecanismos de busca.
+				</p>
+			</Card>
+
+			<Card variant="elevated" padding="lg">
+				<h3>♿ Acessível</h3>
+				<p>
+					Desenvolvido seguindo as melhores práticas de acessibilidade
+					e padrões web modernos.
+				</p>
+			</Card>
+
+			<Card variant="elevated" padding="lg">
+				<h3>🛠️ Fácil de Usar</h3>
+				<p>
+					Interface de administração intuitiva para criar e gerenciar
+					posts sem complicações.
+				</p>
+			</Card>
+		</div>
+	</section>
+
+	<section class="get-started">
+		<Card variant="outlined" padding="lg" class="get-started-card">
+			<h2>Como começar</h2>
+			<p>Algumas ideias para personalizar seu blog:</p>
+			<ul class="get-started-list">
+				<li>
+					✏️ Edite esta página em <code>src/pages/index.astro</code>
+				</li>
+				<li>
+					🧭 Personalize a navegação em <code
+						>src/components/Header.astro</code
+					>
+				</li>
+				<li>
+					📝 Adicione seu nome no rodapé em <code
+						>src/components/Footer.astro</code
+					>
+				</li>
+				<li>
+					📚 Confira os posts incluídos em <code
+						>src/content/blog/</code
+					>
+				</li>
+				<li>
+					🎨 Customize o layout dos posts em <code
+						>src/layouts/BlogPost.astro</code
+					>
+				</li>
 			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+			<div class="get-started-actions">
+				<Button href="/admin" variant="primary">
+					Administrar Posts
+				</Button>
+				<Button
+					href="https://docs.astro.build/"
+					variant="ghost"
+					target="_blank"
+				>
+					📖 Documentação
+				</Button>
+			</div>
+		</Card>
+	</section>
+</BaseLayout>
+
+<style>
+	.homepage {
+		padding-top: var(--space-4);
+	}
+
+	/* Hero Section */
+	.hero {
+		text-align: center;
+		margin-bottom: var(--space-20);
+	}
+
+	.hero-content {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.hero-title {
+		font-size: clamp(var(--font-size-4xl), 8vw, var(--font-size-6xl));
+		font-weight: var(--font-weight-extrabold);
+		color: var(--color-neutral-900);
+		margin-bottom: var(--space-6);
+		line-height: var(--line-height-tight);
+	}
+
+	.hero-emoji {
+		display: inline-block;
+		animation: wave 2s ease-in-out infinite;
+		transform-origin: 70% 70%;
+	}
+
+	@keyframes wave {
+		0%,
+		100% {
+			transform: rotate(0deg);
+		}
+		10%,
+		30% {
+			transform: rotate(-10deg);
+		}
+		20% {
+			transform: rotate(12deg);
+		}
+		40% {
+			transform: rotate(-4deg);
+		}
+	}
+
+	.hero-description {
+		font-size: var(--font-size-xl);
+		color: var(--color-neutral-600);
+		margin-bottom: var(--space-8);
+		line-height: var(--line-height-relaxed);
+	}
+
+	.hero-actions {
+		display: flex;
+		gap: var(--space-4);
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	/* Features Section */
+	.features {
+		margin-bottom: var(--space-20);
+	}
+
+	.features-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+		gap: var(--space-6);
+	}
+
+	.features-grid h3 {
+		color: var(--color-neutral-900);
+		margin-bottom: var(--space-3);
+		font-size: var(--font-size-xl);
+		font-weight: var(--font-weight-semibold);
+	}
+
+	.features-grid p {
+		color: var(--color-neutral-700);
+		line-height: var(--line-height-relaxed);
+		margin: 0;
+	}
+
+	/* Get Started Section */
+	.get-started {
+		margin-bottom: var(--space-12);
+	}
+
+	.get-started-card {
+		max-width: 800px;
+		margin: 0 auto;
+		text-align: center;
+	}
+
+	.get-started-card h2 {
+		color: var(--color-neutral-900);
+		margin-bottom: var(--space-4);
+		font-size: var(--font-size-3xl);
+	}
+
+	.get-started-card > p {
+		color: var(--color-neutral-600);
+		font-size: var(--font-size-lg);
+		margin-bottom: var(--space-6);
+	}
+
+	.get-started-list {
+		text-align: left;
+		margin: var(--space-6) 0;
+		padding-left: var(--space-6);
+	}
+
+	.get-started-list li {
+		margin: var(--space-3) 0;
+		color: var(--color-neutral-700);
+		line-height: var(--line-height-relaxed);
+	}
+
+	.get-started-list code {
+		background: var(--color-neutral-100);
+		color: var(--color-primary-700);
+		padding: var(--space-1) var(--space-2);
+		border-radius: var(--border-radius-base);
+		font-family: var(--font-family-mono);
+		font-size: 0.9em;
+	}
+
+	.get-started-actions {
+		display: flex;
+		gap: var(--space-4);
+		justify-content: center;
+		flex-wrap: wrap;
+		margin-top: var(--space-6);
+	}
+
+	/* Dark mode */
+	@media (prefers-color-scheme: dark) {
+		.hero-title {
+			color: var(--color-neutral-900);
+		}
+
+		.hero-description {
+			color: var(--color-neutral-700);
+		}
+
+		.features-grid h3 {
+			color: var(--color-neutral-900);
+		}
+
+		.features-grid p {
+			color: var(--color-neutral-800);
+		}
+
+		.get-started-card h2 {
+			color: var(--color-neutral-900);
+		}
+
+		.get-started-card > p {
+			color: var(--color-neutral-700);
+		}
+
+		.get-started-list li {
+			color: var(--color-neutral-800);
+		}
+
+		.get-started-list code {
+			background: var(--color-neutral-200);
+			color: var(--color-primary-600);
+		}
+	}
+
+	/* Responsividade */
+	@media (max-width: 768px) {
+		.homepage {
+			padding-top: var(--space-2);
+		}
+
+		.hero {
+			margin-bottom: var(--space-12);
+		}
+
+		.hero-actions {
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.features {
+			margin-bottom: var(--space-12);
+		}
+
+		.features-grid {
+			grid-template-columns: 1fr;
+			gap: var(--space-4);
+		}
+
+		.get-started-actions {
+			flex-direction: column;
+			align-items: center;
+		}
+
+		.get-started-list {
+			padding-left: var(--space-4);
+		}
+	}
+
+	/* Redução de movimento */
+	@media (prefers-reduced-motion: reduce) {
+		.hero-emoji {
+			animation: none;
+		}
+	}
+</style>

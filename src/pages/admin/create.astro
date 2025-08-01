@@ -1,691 +1,798 @@
 ---
-import BaseHead from "../../components/BaseHead.astro";
-import Header from "../../components/Header.astro";
-import Footer from "../../components/Footer.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Card from "../../components/ui/Card.astro";
+import Button from "../../components/ui/Button.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 ---
 
-<!doctype html>
-<html lang="pt-br">
-	<head>
-		<BaseHead
-			title={`Criar Post - Admin - ${SITE_TITLE}`}
-			description={SITE_DESCRIPTION}
-		/>
-		<!-- TinyMCE será carregado via CDN -->
-		<script
-			is:inline
-			src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js"
-		></script>
-		<script is:inline src="https://unpkg.com/turndown/dist/turndown.js"
-		></script>
-		<style>
-			.admin-container {
-				max-width: 800px;
-				margin: 0 auto;
-				padding: 2rem;
-			}
+<!-- TinyMCE será carregado via CDN -->
+<script is:inline src="https://cdn.jsdelivr.net/npm/tinymce@7/tinymce.min.js"
+></script>
+<script is:inline src="https://unpkg.com/turndown/dist/turndown.js"></script>
 
-			.admin-header {
-				display: flex;
-				justify-content: space-between;
-				align-items: center;
-				margin-bottom: 2rem;
-				padding-bottom: 1rem;
-				border-bottom: 2px solid #e1e5e9;
-			}
+<BaseLayout
+	title={`Criar Post - Admin - ${SITE_TITLE}`}
+	description={SITE_DESCRIPTION}
+	class="admin-create-page"
+>
+	<section class="admin-header">
+		<div class="admin-header-content">
+			<h1 class="admin-title">Criar Novo Post</h1>
+			<Button href="/admin" variant="secondary">
+				← Voltar ao Admin
+			</Button>
+		</div>
+	</section>
 
-			.admin-title {
-				font-size: 2rem;
-				font-weight: bold;
-				color: #2c3e50;
-			}
+	<section class="form-section">
+		<Card variant="elevated" padding="lg" class="form-container">
+			<div id="message-container"></div>
 
-			.btn {
-				display: inline-block;
-				padding: 0.75rem 1.5rem;
-				border-radius: 8px;
-				text-decoration: none;
-				font-weight: 600;
-				transition: all 0.3s ease;
-				border: none;
-				cursor: pointer;
-			}
-
-			.btn-secondary {
-				background: #f8f9fa;
-				color: #495057;
-				border: 1px solid #dee2e6;
-			}
-
-			.btn-secondary:hover {
-				background: #e9ecef;
-			}
-
-			.btn-primary {
-				background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-				color: white;
-			}
-
-			.btn-primary:hover {
-				transform: translateY(-2px);
-				box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-			}
-
-			.form-container {
-				background: white;
-				border-radius: 12px;
-				padding: 2rem;
-				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-				border: 1px solid #e1e5e9;
-			}
-
-			.form-group {
-				margin-bottom: 1.5rem;
-			}
-
-			.form-label {
-				display: block;
-				margin-bottom: 0.5rem;
-				font-weight: 600;
-				color: #2c3e50;
-			}
-
-			.form-input {
-				width: 100%;
-				padding: 0.75rem;
-				border: 1px solid #dee2e6;
-				border-radius: 6px;
-				font-size: 1rem;
-				transition: border-color 0.3s ease;
-			}
-
-			.form-input:focus {
-				outline: none;
-				border-color: #667eea;
-				box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-			}
-
-			.form-textarea {
-				min-height: 400px;
-				font-family: "SF Mono", "Monaco", "Inconsolata", "Roboto Mono",
-					monospace;
-				resize: vertical;
-				line-height: 1.6;
-				font-size: 14px;
-			}
-
-			.form-actions {
-				display: flex;
-				gap: 1rem;
-				justify-content: flex-end;
-				margin-top: 2rem;
-			}
-
-			.loading {
-				opacity: 0.6;
-				pointer-events: none;
-			}
-
-			.error-message {
-				background: #f8d7da;
-				color: #721c24;
-				padding: 0.75rem;
-				border-radius: 6px;
-				margin-bottom: 1rem;
-				border: 1px solid #f5c6cb;
-			}
-
-			.success-message {
-				background: #d4edda;
-				color: #155724;
-				padding: 0.75rem;
-				border-radius: 6px;
-				margin-bottom: 1rem;
-				border: 1px solid #c3e6cb;
-			}
-
-			.help-text {
-				font-size: 0.875rem;
-				color: #6c757d;
-				margin-top: 0.25rem;
-			}
-
-			/* TinyMCE Customization */
-			#tinymce-container {
-				border: 1px solid #dee2e6;
-				border-radius: 6px;
-				overflow: hidden;
-			}
-
-			.tox .tox-editor-header {
-				border-bottom: 1px solid #dee2e6 !important;
-			}
-
-			.tox-tinymce {
-				border: none !important;
-				border-radius: 6px !important;
-			}
-
-			.image-upload-container {
-				display: flex;
-				flex-direction: column;
-				gap: 0.5rem;
-			}
-
-			.upload-section {
-				display: flex;
-				align-items: center;
-				gap: 1rem;
-			}
-
-			.upload-btn {
-				white-space: nowrap;
-			}
-
-			.upload-status {
-				font-size: 0.875rem;
-				font-weight: 500;
-			}
-
-			.upload-status.success {
-				color: #28a745;
-			}
-
-			.upload-status.error {
-				color: #dc3545;
-			}
-
-			.upload-status.loading {
-				color: #6c757d;
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<div class="admin-container">
-				<div class="admin-header">
-					<h1 class="admin-title">Criar Novo Post</h1>
-					<a href="/admin" class="btn btn-secondary">
-						← Voltar ao Admin
-					</a>
+			<form id="create-form">
+				<div class="form-group">
+					<label for="title" class="form-label">Título *</label>
+					<input
+						type="text"
+						id="title"
+						name="title"
+						class="form-input"
+						required
+						placeholder="Digite o título do post"
+					/>
 				</div>
-			</div>
 
-			<div class="form-container">
-				<div id="message-container"></div>
+				<div class="form-group">
+					<label for="description" class="form-label"
+						>Descrição *</label
+					>
+					<input
+						type="text"
+						id="description"
+						name="description"
+						class="form-input"
+						required
+						placeholder="Breve descrição do post"
+					/>
+					<div class="help-text">
+						Esta descrição aparecerá nas meta tags e listagem de
+						posts
+					</div>
+				</div>
 
-				<form id="create-form">
-					<div class="form-group">
-						<label for="title" class="form-label">Título *</label>
+				<div class="form-group">
+					<label for="pubDate" class="form-label"
+						>Data de Publicação *</label
+					>
+					<input
+						type="date"
+						id="pubDate"
+						name="pubDate"
+						class="form-input"
+						required
+					/>
+				</div>
+
+				<div class="form-group">
+					<label for="heroImage" class="form-label"
+						>Imagem de Destaque</label
+					>
+					<div class="image-upload-container">
 						<input
 							type="text"
-							id="title"
-							name="title"
+							id="heroImage"
+							name="heroImage"
 							class="form-input"
-							required
-							placeholder="Digite o título do post"
+							placeholder="../../assets/blog-placeholder-1.jpg"
+							readonly
 						/>
-					</div>
-
-					<div class="form-group">
-						<label for="description" class="form-label"
-							>Descrição *</label
-						>
-						<input
-							type="text"
-							id="description"
-							name="description"
-							class="form-input"
-							required
-							placeholder="Breve descrição do post"
-						/>
-						<div class="help-text">
-							Esta descrição aparecerá nas meta tags e listagem de
-							posts
-						</div>
-					</div>
-
-					<div class="form-group">
-						<label for="pubDate" class="form-label"
-							>Data de Publicação *</label
-						>
-						<input
-							type="date"
-							id="pubDate"
-							name="pubDate"
-							class="form-input"
-							required
-						/>
-					</div>
-
-					<div class="form-group">
-						<label for="heroImage" class="form-label"
-							>Imagem de Destaque</label
-						>
-						<div class="image-upload-container">
+						<div class="upload-section">
 							<input
-								type="text"
-								id="heroImage"
-								name="heroImage"
-								class="form-input"
-								placeholder="../../assets/blog-placeholder-1.jpg"
-								readonly
+								type="file"
+								id="imageUpload"
+								accept="image/jpeg,image/jpg,image/png,image/webp"
+								style="display: none;"
 							/>
-							<div class="upload-section">
-								<input
-									type="file"
-									id="imageUpload"
-									accept="image/jpeg,image/jpg,image/png,image/webp"
-									style="display: none;"
-								/>
-								<button
-									type="button"
-									id="selectImageBtn"
-									class="btn btn-secondary upload-btn"
-								>
-									📁 Selecionar Imagem
-								</button>
-								<span id="uploadStatus" class="upload-status"
-								></span>
-							</div>
-						</div>
-						<div class="help-text">
-							Selecione uma imagem do seu computador (será
-							automaticamente otimizada e convertida para WebP) ou
-							digite o caminho manualmente (opcional)
+							<button
+								type="button"
+								id="selectImageBtn"
+								class="btn btn--secondary btn--sm upload-btn"
+							>
+								📁 Selecionar Imagem
+							</button>
+							<span id="uploadStatus" class="upload-status"
+							></span>
 						</div>
 					</div>
-
-					<div class="form-group">
-						<label for="content" class="form-label"
-							>Conteúdo *</label
-						>
-
-						<div id="tinymce-container">
-							<textarea
-								id="content"
-								name="content"
-								required
-								placeholder="Digite o conteúdo do post..."
-							></textarea>
-						</div>
-						<div class="help-text">
-							Use a barra de ferramentas do editor para formatação
-							visual. O conteúdo será convertido automaticamente
-							para Markdown.
-						</div>
+					<div class="help-text">
+						Selecione uma imagem do seu computador (será
+						automaticamente otimizada e convertida para WebP) ou
+						digite o caminho manualmente (opcional)
 					</div>
+				</div>
 
-					<div class="form-actions">
-						<button
-							type="button"
-							id="preview-btn"
-							class="btn btn-secondary"
-						>
-							Visualizar
-						</button>
-						<button type="submit" class="btn btn-primary">
-							Criar Post
-						</button>
+				<div class="form-group">
+					<label for="content" class="form-label">Conteúdo *</label>
+					<div id="tinymce-container">
+						<textarea
+							id="content"
+							name="content"
+							required
+							placeholder="Digite o conteúdo do post..."
+						></textarea>
 					</div>
-				</form>
-			</div>
-		</main>
+					<div class="help-text">
+						Use a barra de ferramentas do editor para formatação
+						visual. O conteúdo será convertido automaticamente para
+						Markdown.
+					</div>
+				</div>
 
-		<Footer />
+				<div class="form-actions">
+					<button
+						type="button"
+						id="preview-btn"
+						class="btn btn--ghost"
+					>
+						Visualizar
+					</button>
+					<button type="submit" class="btn btn--primary">
+						Criar Post
+					</button>
+				</div>
+			</form>
+		</Card>
+	</section>
+</BaseLayout>
 
-		<script>
-			// Definir data atual como padrão
-			document.getElementById("pubDate").valueAsDate = new Date();
+<style>
+	.admin-create-page {
+		padding-top: var(--space-4);
+	}
 
-			// Inicializar conversor HTML -> Markdown
-			const turndownService = new TurndownService({
-				codeBlockStyle: "fenced",
-				headingStyle: "atx",
-				emDelimiter: "*",
-				strongDelimiter: "**",
+	/* Admin Header */
+	.admin-header {
+		text-align: center;
+		margin-bottom: var(--space-8);
+	}
+
+	.admin-header-content {
+		max-width: 800px;
+		margin: 0 auto;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding-bottom: var(--space-6);
+		border-bottom: var(--border-width-2) solid var(--color-neutral-300);
+	}
+
+	.admin-title {
+		font-size: clamp(var(--font-size-2xl), 4vw, var(--font-size-3xl));
+		font-weight: var(--font-weight-extrabold);
+		color: var(--color-neutral-900);
+		margin: 0;
+		line-height: var(--line-height-tight);
+	}
+
+	/* Form Section */
+	.form-section {
+		max-width: 800px;
+		margin: 0 auto;
+	}
+
+	.form-container {
+		width: 100%;
+	}
+
+	.form-group {
+		margin-bottom: var(--space-6);
+	}
+
+	.form-label {
+		display: block;
+		margin-bottom: var(--space-2);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-neutral-900);
+		font-size: var(--font-size-base);
+	}
+
+	.form-input {
+		width: 100%;
+		padding: var(--space-3);
+		border: var(--border-width-1) solid var(--color-neutral-300);
+		border-radius: var(--border-radius-md);
+		font-size: var(--font-size-base);
+		font-family: var(--font-family-primary);
+		transition: var(--transition-colors);
+		background: var(--color-neutral-50);
+		color: var(--color-neutral-900);
+	}
+
+	.form-input:focus {
+		outline: none;
+		border-color: var(--color-primary-500);
+		box-shadow: 0 0 0 3px var(--color-primary-200);
+	}
+
+	.form-actions {
+		display: flex;
+		gap: var(--space-3);
+		justify-content: flex-end;
+		margin-top: var(--space-8);
+	}
+
+	.loading {
+		opacity: 0.6;
+		pointer-events: none;
+	}
+
+	.error-message {
+		background: var(--color-error-50);
+		color: var(--color-error-700);
+		padding: var(--space-3);
+		border-radius: var(--border-radius-md);
+		margin-bottom: var(--space-4);
+		border: var(--border-width-1) solid var(--color-error-200);
+	}
+
+	.success-message {
+		background: var(--color-success-50);
+		color: var(--color-success-700);
+		padding: var(--space-3);
+		border-radius: var(--border-radius-md);
+		margin-bottom: var(--space-4);
+		border: var(--border-width-1) solid var(--color-success-200);
+	}
+
+	.help-text {
+		font-size: var(--font-size-sm);
+		color: var(--color-neutral-600);
+		margin-top: var(--space-1);
+		line-height: var(--line-height-relaxed);
+	}
+
+	/* TinyMCE Customization */
+	#tinymce-container {
+		border: var(--border-width-1) solid var(--color-neutral-300);
+		border-radius: var(--border-radius-md);
+		overflow: hidden;
+		background: var(--color-neutral-50);
+	}
+
+	.tox .tox-editor-header {
+		border-bottom: var(--border-width-1) solid var(--color-neutral-300) !important;
+	}
+
+	.tox-tinymce {
+		border: none !important;
+		border-radius: var(--border-radius-md) !important;
+	}
+
+	.image-upload-container {
+		display: flex;
+		flex-direction: column;
+		gap: var(--space-2);
+	}
+
+	.upload-section {
+		display: flex;
+		align-items: center;
+		gap: var(--space-3);
+	}
+
+	.upload-btn {
+		white-space: nowrap;
+	}
+
+	/* Botões inline */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		justify-content: center;
+		gap: var(--space-2);
+		border: var(--border-width-1) solid transparent;
+		border-radius: var(--border-radius-lg);
+		font-family: var(--font-family-primary);
+		font-weight: var(--font-weight-medium);
+		text-decoration: none;
+		text-align: center;
+		cursor: pointer;
+		transition: var(--transition-all);
+		white-space: nowrap;
+		user-select: none;
+		position: relative;
+		overflow: hidden;
+	}
+
+	.btn--sm {
+		padding: var(--space-2) var(--space-3);
+		font-size: var(--font-size-sm);
+		min-height: 2rem;
+	}
+
+	.btn--primary {
+		background: linear-gradient(
+			135deg,
+			var(--color-primary-600) 0%,
+			var(--color-primary-700) 100%
+		);
+		color: white;
+		box-shadow: var(--shadow-sm);
+	}
+
+	.btn--primary:hover:not(:disabled) {
+		background: linear-gradient(
+			135deg,
+			var(--color-primary-700) 0%,
+			var(--color-primary-800) 100%
+		);
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-md);
+	}
+
+	.btn--secondary {
+		background: var(--color-neutral-50);
+		color: var(--color-neutral-800);
+		border-color: var(--color-neutral-300);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.btn--secondary:hover:not(:disabled) {
+		background: var(--color-neutral-100);
+		border-color: var(--color-neutral-400);
+		transform: translateY(-1px);
+		box-shadow: var(--shadow-md);
+	}
+
+	.btn--ghost {
+		background: transparent;
+		color: var(--color-primary-600);
+		border: none;
+	}
+
+	.btn--ghost:hover:not(:disabled) {
+		background: var(--color-primary-50);
+		color: var(--color-primary-700);
+	}
+
+	.upload-status {
+		font-size: var(--font-size-sm);
+		font-weight: var(--font-weight-medium);
+	}
+
+	.upload-status.success {
+		color: var(--color-success-600);
+	}
+
+	.upload-status.error {
+		color: var(--color-error-600);
+	}
+
+	.upload-status.loading {
+		color: var(--color-neutral-600);
+	}
+
+	/* Dark mode */
+	@media (prefers-color-scheme: dark) {
+		.admin-header-content {
+			border-bottom-color: var(--color-neutral-400);
+		}
+
+		.admin-title {
+			color: var(--color-neutral-900);
+		}
+
+		.form-label {
+			color: var(--color-neutral-900);
+		}
+
+		.form-input {
+			background: var(--color-neutral-200);
+			color: var(--color-neutral-900);
+			border-color: var(--color-neutral-400);
+		}
+
+		.form-input:focus {
+			border-color: var(--color-primary-400);
+			box-shadow: 0 0 0 3px var(--color-primary-200);
+		}
+
+		.help-text {
+			color: var(--color-neutral-600);
+		}
+
+		#tinymce-container {
+			background: var(--color-neutral-200);
+			border-color: var(--color-neutral-400);
+		}
+
+		.tox .tox-editor-header {
+			border-bottom-color: var(--color-neutral-400) !important;
+		}
+
+		.upload-status.success {
+			color: var(--color-success-500);
+		}
+
+		.upload-status.error {
+			color: var(--color-error-500);
+		}
+
+		.btn--secondary {
+			background: var(--color-neutral-200);
+			color: var(--color-neutral-900);
+			border-color: var(--color-neutral-300);
+		}
+
+		.btn--secondary:hover:not(:disabled) {
+			background: var(--color-neutral-100);
+			border-color: var(--color-neutral-400);
+		}
+
+		.btn--ghost {
+			color: var(--color-primary-400);
+		}
+
+		.btn--ghost:hover:not(:disabled) {
+			background: var(--color-primary-100);
+			color: var(--color-primary-700);
+		}
+	}
+
+	/* Responsividade */
+	@media (max-width: 768px) {
+		.admin-header-content {
+			flex-direction: column;
+			gap: var(--space-4);
+			text-align: center;
+		}
+
+		.form-actions {
+			flex-direction: column;
+		}
+
+		.upload-section {
+			flex-direction: column;
+			align-items: stretch;
+		}
+	}
+</style>
+
+<script>
+	// Definir data atual como padrão
+	document.getElementById("pubDate").valueAsDate = new Date();
+
+	// Inicializar conversor HTML -> Markdown
+	const turndownService = new TurndownService({
+		codeBlockStyle: "fenced",
+		headingStyle: "atx",
+		emDelimiter: "*",
+		strongDelimiter: "**",
+	});
+
+	// Configurar regras customizadas do Turndown
+	turndownService.addRule("strikethrough", {
+		filter: ["s", "strike", "del"],
+		replacement: function (content) {
+			return "~~" + content + "~~";
+		},
+	});
+
+	// Variável para armazenar instância do TinyMCE
+	let editor = null;
+
+	// Inicializar TinyMCE
+	tinymce.init({
+		selector: "#content",
+		license_key: "gpl",
+		language: "pt_BR",
+		language_url: "/js/tinymce/langs/pt_BR.js",
+		height: 500,
+		menubar: false,
+		branding: false,
+		promotion: false,
+		plugins: [
+			"advlist",
+			"autolink",
+			"lists",
+			"link",
+			"image",
+			"charmap",
+			"preview",
+			"anchor",
+			"searchreplace",
+			"visualblocks",
+			"code",
+			"fullscreen",
+			"insertdatetime",
+			"media",
+			"table",
+			"help",
+			"wordcount",
+			"codesample",
+		],
+		toolbar:
+			"undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | codesample blockquote hr | preview code fullscreen | help",
+		toolbar_mode: "sliding",
+		block_formats:
+			"Parágrafo=p; Título 1=h1; Título 2=h2; Título 3=h3; Título 4=h4; Título 5=h5; Título 6=h6; Citação=blockquote; Código=pre",
+		content_style: `
+			body { 
+				font-family: system-ui, sans-serif; 
+				font-size: 16px; 
+				line-height: 1.6; 
+				color: #333; 
+				max-width: none; 
+				margin: 0; 
+				padding: 20px; 
+			}
+			h1, h2, h3, h4, h5, h6 { 
+				color: #2c3e50; 
+				margin-top: 1.5em; 
+				margin-bottom: 0.5em; 
+			}
+			blockquote { 
+				border-left: 4px solid #667eea; 
+				padding-left: 1rem; 
+				margin: 1rem 0; 
+				font-style: italic; 
+				color: #666; 
+			}
+			pre { 
+				background: #f8f9fa; 
+				padding: 1rem; 
+				border-radius: 6px; 
+				overflow-x: auto; 
+				border: 1px solid #e9ecef; 
+			}
+			code { 
+				background: #f8f9fa; 
+				padding: 0.2rem 0.4rem; 
+				border-radius: 3px; 
+				font-family: 'Courier New', monospace; 
+			}
+			table { 
+				border-collapse: collapse; 
+				width: 100%; 
+				margin: 1rem 0; 
+			}
+			table th, table td { 
+				border: 1px solid #dee2e6; 
+				padding: 0.75rem; 
+				text-align: left; 
+			}
+			table th { 
+				background: #f8f9fa; 
+				font-weight: 600; 
+			}
+		`,
+		setup: function (ed) {
+			editor = ed;
+			// Sincronizar conteúdo automaticamente ao digitar
+			ed.on("input keyup paste", function () {
+				const htmlContent = ed.getContent();
+				document.getElementById("content").value = htmlContent;
 			});
+		},
+		init_instance_callback: function (ed) {
+			editor = ed;
+		},
+	});
 
-			// Configurar regras customizadas do Turndown
-			turndownService.addRule("strikethrough", {
-				filter: ["s", "strike", "del"],
-				replacement: function (content) {
-					return "~~" + content + "~~";
-				},
-			});
+	// Formulário de criação
+	document
+		.getElementById("create-form")
+		.addEventListener("submit", async (e) => {
+			e.preventDefault();
 
-			// Variável para armazenar instância do TinyMCE
-			let editor = null;
+			const form = e.target;
+			const messageContainer =
+				document.getElementById("message-container");
+			const submitBtn = form.querySelector('button[type="submit"]');
 
-			// Inicializar TinyMCE
-			tinymce.init({
-				selector: "#content",
-				license_key: "gpl",
-				language: "pt_BR",
-				language_url: "/js/tinymce/langs/pt_BR.js",
-				height: 500,
-				menubar: false,
-				branding: false,
-				promotion: false,
-				plugins: [
-					"advlist",
-					"autolink",
-					"lists",
-					"link",
-					"image",
-					"charmap",
-					"preview",
-					"anchor",
-					"searchreplace",
-					"visualblocks",
-					"code",
-					"fullscreen",
-					"insertdatetime",
-					"media",
-					"table",
-					"help",
-					"wordcount",
-					"codesample",
-				],
-				toolbar:
-					"undo redo | styles | bold italic underline strikethrough | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image media table | codesample blockquote hr | preview code fullscreen | help",
-				toolbar_mode: "sliding",
-				block_formats:
-					"Parágrafo=p; Título 1=h1; Título 2=h2; Título 3=h3; Título 4=h4; Título 5=h5; Título 6=h6; Citação=blockquote; Código=pre",
-				content_style: `
-					body { 
-						font-family: system-ui, sans-serif; 
-						font-size: 16px; 
-						line-height: 1.6; 
-						color: #333; 
-						max-width: none; 
-						margin: 0; 
-						padding: 20px; 
-					}
-					h1, h2, h3, h4, h5, h6 { 
-						color: #2c3e50; 
-						margin-top: 1.5em; 
-						margin-bottom: 0.5em; 
-					}
-					blockquote { 
-						border-left: 4px solid #667eea; 
-						padding-left: 1rem; 
-						margin: 1rem 0; 
-						font-style: italic; 
-						color: #666; 
-					}
-					pre { 
-						background: #f8f9fa; 
-						padding: 1rem; 
-						border-radius: 6px; 
-						overflow-x: auto; 
-						border: 1px solid #e9ecef; 
-					}
-					code { 
-						background: #f8f9fa; 
-						padding: 0.2rem 0.4rem; 
-						border-radius: 3px; 
-						font-family: 'Courier New', monospace; 
-					}
-					table { 
-						border-collapse: collapse; 
-						width: 100%; 
-						margin: 1rem 0; 
-					}
-					table th, table td { 
-						border: 1px solid #dee2e6; 
-						padding: 0.75rem; 
-						text-align: left; 
-					}
-					table th { 
-						background: #f8f9fa; 
-						font-weight: 600; 
-					}
-				`,
-				setup: function (ed) {
-					editor = ed;
-					// Sincronizar conteúdo automaticamente ao digitar
-					ed.on("input keyup paste", function () {
-						const htmlContent = ed.getContent();
-						document.getElementById("content").value = htmlContent;
-					});
-				},
-				init_instance_callback: function (ed) {
-					editor = ed;
-				},
-			});
+			// Sincronizar conteúdo do TinyMCE com o textarea antes da validação
+			if (editor) {
+				const htmlContent = editor.getContent();
+				document.getElementById("content").value = htmlContent;
+			}
 
-			// Formulário de criação
-			document
-				.getElementById("create-form")
-				.addEventListener("submit", async (e) => {
-					e.preventDefault();
+			// Verificar se o conteúdo foi preenchido
+			const contentTextarea = document.getElementById("content");
+			if (!contentTextarea.value.trim()) {
+				messageContainer.innerHTML = `
+					<div class="error-message">
+						O campo de conteúdo é obrigatório.
+					</div>
+				`;
+				return;
+			}
 
-					const form = e.target;
-					const messageContainer =
-						document.getElementById("message-container");
-					const submitBtn = form.querySelector(
-						'button[type="submit"]',
-					);
+			// Loading state
+			form.classList.add("loading");
+			submitBtn.textContent = "Criando...";
+			messageContainer.innerHTML = "";
 
-					// Sincronizar conteúdo do TinyMCE com o textarea antes da validação
-					if (editor) {
-						const htmlContent = editor.getContent();
-						document.getElementById("content").value = htmlContent;
-					}
+			try {
+				const formData = new FormData(form);
+				// Obter conteúdo HTML do TinyMCE e converter para Markdown
+				const htmlContent = editor ? editor.getContent() : "";
+				const markdownContent = turndownService.turndown(htmlContent);
 
-					// Verificar se o conteúdo foi preenchido
-					const contentTextarea = document.getElementById("content");
-					if (!contentTextarea.value.trim()) {
-						messageContainer.innerHTML = `
-							<div class="error-message">
-								O campo de conteúdo é obrigatório.
-							</div>
-						`;
-						return;
-					}
+				const data = {
+					title: formData.get("title"),
+					description: formData.get("description"),
+					pubDate: formData.get("pubDate"),
+					heroImage: formData.get("heroImage") || undefined,
+					content: markdownContent,
+				};
 
-					// Loading state
-					form.classList.add("loading");
-					submitBtn.textContent = "Criando...";
-					messageContainer.innerHTML = "";
+				const response = await fetch("/api/posts", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+					},
+					body: JSON.stringify(data),
+				});
 
-					try {
-						const formData = new FormData(form);
-						// Obter conteúdo HTML do TinyMCE e converter para Markdown
-						const htmlContent = editor ? editor.getContent() : "";
-						const markdownContent =
-							turndownService.turndown(htmlContent);
+				if (response.ok) {
+					const result = await response.json();
+					messageContainer.innerHTML = `
+					<div class="success-message">
+						Post criado com sucesso! Redirecionando...
+					</div>
+				`;
 
-						const data = {
-							title: formData.get("title"),
-							description: formData.get("description"),
-							pubDate: formData.get("pubDate"),
-							heroImage: formData.get("heroImage") || undefined,
-							content: markdownContent,
-						};
+					setTimeout(() => {
+						window.location.href = "/admin";
+					}, 1500);
+				} else {
+					const error = await response.json();
+					throw new Error(error.message || "Erro ao criar post");
+				}
+			} catch (error) {
+				messageContainer.innerHTML = `
+				<div class="error-message">
+					Erro: ${error.message}
+				</div>
+			`;
+			} finally {
+				form.classList.remove("loading");
+				submitBtn.textContent = "Criar Post";
+			}
+		});
 
-						const response = await fetch("/api/posts", {
-							method: "POST",
-							headers: {
-								"Content-Type": "application/json",
-							},
-							body: JSON.stringify(data),
-						});
+	// Botão de preview
+	document.getElementById("preview-btn").addEventListener("click", () => {
+		const title = document.getElementById("title").value;
+		const htmlContent = editor ? editor.getContent() : "";
 
-						if (response.ok) {
-							const result = await response.json();
-							messageContainer.innerHTML = `
-							<div class="success-message">
-								Post criado com sucesso! Redirecionando...
-							</div>
-						`;
+		if (!title || !htmlContent) {
+			alert("Preencha pelo menos o título e conteúdo para visualizar");
+			return;
+		}
 
-							setTimeout(() => {
-								window.location.href = "/admin";
-							}, 1500);
-						} else {
-							const error = await response.json();
-							throw new Error(
-								error.message || "Erro ao criar post",
-							);
+		// Abrir preview em nova aba com o conteúdo HTML
+		const previewWindow = window.open("", "_blank");
+		previewWindow.document.write(`
+			<html>
+				<head>
+					<title>Preview: ${title}</title>
+					<meta charset="UTF-8">
+					<style>
+						body { 
+							max-width: 800px; 
+							margin: 0 auto; 
+							padding: 2rem; 
+							font-family: system-ui, sans-serif; 
+							line-height: 1.6; 
+							color: #333;
 						}
-					} catch (error) {
-						messageContainer.innerHTML = `
-						<div class="error-message">
-							Erro: ${error.message}
-						</div>
+						h1, h2, h3, h4, h5, h6 { 
+							color: #2c3e50; 
+							margin-top: 1.5em; 
+							margin-bottom: 0.5em; 
+						}
+						h1 { font-size: 2rem; }
+						h2 { font-size: 1.75rem; }
+						h3 { font-size: 1.5rem; }
+						blockquote { 
+							border-left: 4px solid #667eea; 
+							padding-left: 1rem; 
+							margin: 1rem 0; 
+							font-style: italic; 
+							color: #666; 
+						}
+						pre { 
+							background: #f8f9fa; 
+							padding: 1rem; 
+							border-radius: 6px; 
+							overflow-x: auto; 
+							border: 1px solid #e9ecef; 
+						}
+						code { 
+							background: #f8f9fa; 
+							padding: 0.2rem 0.4rem; 
+							border-radius: 3px; 
+							font-family: 'Courier New', monospace; 
+						}
+						table { 
+							border-collapse: collapse; 
+							width: 100%; 
+							margin: 1rem 0; 
+						}
+						table th, table td { 
+							border: 1px solid #dee2e6; 
+							padding: 0.75rem; 
+							text-align: left; 
+						}
+						table th { 
+							background: #f8f9fa; 
+							font-weight: 600; 
+						}
+						img { 
+							max-width: 100%; 
+							height: auto; 
+							border-radius: 6px; 
+						}
+					</style>
+				</head>
+				<body>
+					<h1>${title}</h1>
+					<div>${htmlContent}</div>
+				</body>
+			</html>
+		`);
+	});
+
+	// Funcionalidade de upload de imagem
+	document.getElementById("selectImageBtn").addEventListener("click", () => {
+		document.getElementById("imageUpload").click();
+	});
+
+	document
+		.getElementById("imageUpload")
+		.addEventListener("change", async (e) => {
+			const file = e.target.files[0];
+			if (!file) return;
+
+			const uploadStatus = document.getElementById("uploadStatus");
+			const heroImageInput = document.getElementById("heroImage");
+
+			// Mostrar status de carregamento
+			uploadStatus.textContent = "Fazendo upload...";
+			uploadStatus.className = "upload-status loading";
+
+			try {
+				const formData = new FormData();
+				formData.append("image", file);
+
+				const response = await fetch("/api/upload-image", {
+					method: "POST",
+					body: formData,
+				});
+
+				const result = await response.json();
+
+				if (result.success) {
+					// Atualizar o campo heroImage com o caminho da imagem
+					heroImageInput.value = result.path;
+
+					// Mostrar informações de otimização
+					const optimization = result.optimization;
+					uploadStatus.innerHTML = `
+						✅ <strong>${result.filename}</strong><br>
+						📦 ${optimization.originalSize} → ${optimization.optimizedSize} 
+						(${optimization.reduction} menor)
 					`;
-					} finally {
-						form.classList.remove("loading");
-						submitBtn.textContent = "Criar Post";
-					}
-				});
+					uploadStatus.className = "upload-status success";
+				} else {
+					throw new Error(result.message);
+				}
+			} catch (error) {
+				uploadStatus.textContent = `❌ ${error.message}`;
+				uploadStatus.className = "upload-status error";
+			}
 
-			// Botão de preview
-			document
-				.getElementById("preview-btn")
-				.addEventListener("click", () => {
-					const title = document.getElementById("title").value;
-					const htmlContent = editor ? editor.getContent() : "";
-
-					if (!title || !htmlContent) {
-						alert(
-							"Preencha pelo menos o título e conteúdo para visualizar",
-						);
-						return;
-					}
-
-					// Abrir preview em nova aba com o conteúdo HTML
-					const previewWindow = window.open("", "_blank");
-					previewWindow.document.write(`
-					<html>
-						<head>
-							<title>Preview: ${title}</title>
-							<meta charset="UTF-8">
-							<style>
-								body { 
-									max-width: 800px; 
-									margin: 0 auto; 
-									padding: 2rem; 
-									font-family: system-ui, sans-serif; 
-									line-height: 1.6; 
-									color: #333;
-								}
-								h1, h2, h3, h4, h5, h6 { 
-									color: #2c3e50; 
-									margin-top: 1.5em; 
-									margin-bottom: 0.5em; 
-								}
-								h1 { font-size: 2rem; }
-								h2 { font-size: 1.75rem; }
-								h3 { font-size: 1.5rem; }
-								blockquote { 
-									border-left: 4px solid #667eea; 
-									padding-left: 1rem; 
-									margin: 1rem 0; 
-									font-style: italic; 
-									color: #666; 
-								}
-								pre { 
-									background: #f8f9fa; 
-									padding: 1rem; 
-									border-radius: 6px; 
-									overflow-x: auto; 
-									border: 1px solid #e9ecef; 
-								}
-								code { 
-									background: #f8f9fa; 
-									padding: 0.2rem 0.4rem; 
-									border-radius: 3px; 
-									font-family: 'Courier New', monospace; 
-								}
-								table { 
-									border-collapse: collapse; 
-									width: 100%; 
-									margin: 1rem 0; 
-								}
-								table th, table td { 
-									border: 1px solid #dee2e6; 
-									padding: 0.75rem; 
-									text-align: left; 
-								}
-								table th { 
-									background: #f8f9fa; 
-									font-weight: 600; 
-								}
-								img { 
-									max-width: 100%; 
-									height: auto; 
-									border-radius: 6px; 
-								}
-							</style>
-						</head>
-						<body>
-							<h1>${title}</h1>
-							<div>${htmlContent}</div>
-						</body>
-					</html>
-				`);
-				});
-
-			// Funcionalidade de upload de imagem
-			document
-				.getElementById("selectImageBtn")
-				.addEventListener("click", () => {
-					document.getElementById("imageUpload").click();
-				});
-
-			document
-				.getElementById("imageUpload")
-				.addEventListener("change", async (e) => {
-					const file = e.target.files[0];
-					if (!file) return;
-
-					const uploadStatus =
-						document.getElementById("uploadStatus");
-					const heroImageInput = document.getElementById("heroImage");
-
-					// Mostrar status de carregamento
-					uploadStatus.textContent = "Fazendo upload...";
-					uploadStatus.className = "upload-status loading";
-
-					try {
-						const formData = new FormData();
-						formData.append("image", file);
-
-						const response = await fetch("/api/upload-image", {
-							method: "POST",
-							body: formData,
-						});
-
-						const result = await response.json();
-
-						if (result.success) {
-							// Atualizar o campo heroImage com o caminho da imagem
-							heroImageInput.value = result.path;
-
-							// Mostrar informações de otimização
-							const optimization = result.optimization;
-							uploadStatus.innerHTML = `
-								✅ <strong>${result.filename}</strong><br>
-								📦 ${optimization.originalSize} → ${optimization.optimizedSize} 
-								(${optimization.reduction} menor)
-							`;
-							uploadStatus.className = "upload-status success";
-						} else {
-							throw new Error(result.message);
-						}
-					} catch (error) {
-						uploadStatus.textContent = `❌ ${error.message}`;
-						uploadStatus.className = "upload-status error";
-					}
-
-					// Limpar o input file para permitir nova seleção
-					e.target.value = "";
-				});
-		</script>
-	</body>
-</html>
+			// Limpar o input file para permitir nova seleção
+			e.target.value = "";
+		});
+</script>

@@ -1,0 +1,238 @@
+---
+interface Props {
+	variant?: 'default' | 'elevated' | 'outlined' | 'ghost';
+	padding?: 'none' | 'sm' | 'md' | 'lg';
+	class?: string;
+	href?: string;
+	target?: '_blank' | '_self' | '_parent' | '_top';
+	rel?: string;
+}
+
+const {
+	variant = 'default',
+	padding = 'md',
+	class: className = '',
+	href,
+	target,
+	rel = target === '_blank' ? 'noopener noreferrer' : undefined,
+} = Astro.props;
+
+const baseClasses = 'card';
+const variantClasses = {
+	default: 'card--default',
+	elevated: 'card--elevated',
+	outlined: 'card--outlined',
+	ghost: 'card--ghost',
+};
+const paddingClasses = {
+	none: 'card--padding-none',
+	sm: 'card--padding-sm',
+	md: 'card--padding-md',
+	lg: 'card--padding-lg',
+};
+
+const classes = [
+	baseClasses,
+	variantClasses[variant],
+	paddingClasses[padding],
+	href ? 'card--clickable' : '',
+	className,
+].filter(Boolean).join(' ');
+
+const Element = href ? 'a' : 'div';
+---
+
+<Element
+	class={classes}
+	href={href}
+	target={target}
+	rel={rel}
+	{...Astro.props}
+>
+	<slot />
+</Element>
+
+<style>
+	.card {
+		/* Base styles */
+		display: block;
+		border-radius: var(--border-radius-xl);
+		transition: var(--transition-all);
+		position: relative;
+		overflow: hidden;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+	}
+
+	/* Clickable cards */
+	.card--clickable {
+		text-decoration: none;
+		color: inherit;
+		cursor: pointer;
+	}
+
+	.card--clickable:focus-visible {
+		outline: 2px solid var(--color-primary-500);
+		outline-offset: 2px;
+	}
+
+	/* Padding variants */
+	.card--padding-none {
+		padding: 0;
+	}
+
+	.card--padding-sm {
+		padding: var(--space-3);
+	}
+
+	.card--padding-md {
+		padding: var(--space-4);
+	}
+
+	.card--padding-lg {
+		padding: var(--space-6);
+	}
+
+	/* Style variants */
+	.card--default {
+		background: var(--color-neutral-50);
+		border: var(--border-width-1) solid var(--color-neutral-200);
+		box-shadow: var(--shadow-sm);
+	}
+
+	.card--default:hover {
+		box-shadow: var(--shadow-md);
+		transform: translateY(-2px);
+	}
+
+	.card--elevated {
+		background: var(--color-neutral-50);
+		box-shadow: var(--shadow-lg);
+		border: none;
+	}
+
+	.card--elevated:hover {
+		box-shadow: var(--shadow-xl);
+		transform: translateY(-4px);
+	}
+
+	.card--outlined {
+		background: transparent;
+		border: var(--border-width-2) solid var(--color-neutral-300);
+		box-shadow: none;
+	}
+
+	.card--outlined:hover {
+		border-color: var(--color-primary-300);
+		box-shadow: var(--shadow-sm);
+		transform: translateY(-1px);
+	}
+
+	.card--ghost {
+		background: transparent;
+		border: none;
+		box-shadow: none;
+	}
+
+	.card--ghost:hover {
+		background: var(--color-neutral-100);
+		transform: translateY(-1px);
+	}
+
+	/* Dark mode adjustments */
+	@media (prefers-color-scheme: dark) {
+		.card--default {
+			background: var(--color-neutral-200);
+			border-color: var(--color-neutral-300);
+		}
+
+		.card--elevated {
+			background: var(--color-neutral-200);
+		}
+
+		.card--outlined {
+			border-color: var(--color-neutral-400);
+		}
+
+		.card--outlined:hover {
+			border-color: var(--color-primary-500);
+		}
+
+		.card--ghost:hover {
+			background: var(--color-neutral-200);
+		}
+	}
+
+	/* Hover effects for clickable cards */
+	.card--clickable.card--default:hover,
+	.card--clickable.card--elevated:hover {
+		cursor: pointer;
+	}
+
+	.card--clickable.card--outlined:hover {
+		border-color: var(--color-primary-400);
+	}
+
+	@media (prefers-color-scheme: dark) {
+		.card--clickable.card--outlined:hover {
+			border-color: var(--color-primary-400);
+		}
+	}
+
+	/* Animation for interactive elements */
+	.card::before {
+		content: '';
+		position: absolute;
+		top: 0;
+		left: 0;
+		right: 0;
+		bottom: 0;
+		background: linear-gradient(
+			45deg,
+			transparent 30%,
+			rgba(255, 255, 255, 0.1) 50%,
+			transparent 70%
+		);
+		transform: translateX(-100%);
+		transition: transform 0.6s ease;
+		pointer-events: none;
+	}
+
+	.card--clickable:hover::before {
+		transform: translateX(100%);
+	}
+
+	.card--ghost::before {
+		display: none;
+	}
+
+	/* Accessibility */
+	@media (prefers-reduced-motion: reduce) {
+		.card {
+			transition: none;
+		}
+
+		.card:hover {
+			transform: none;
+		}
+
+		.card::before {
+			display: none;
+		}
+	}
+
+	/* Responsive adjustments */
+	@media (max-width: 768px) {
+		.card--padding-md {
+			padding: var(--space-3);
+		}
+
+		.card--padding-lg {
+			padding: var(--space-4);
+		}
+
+		.card:hover {
+			transform: none;
+		}
+	}
+</style>

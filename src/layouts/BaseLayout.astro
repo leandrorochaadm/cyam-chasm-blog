@@ -1,0 +1,145 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import type { ImageMetadata } from 'astro';
+
+interface Props {
+	title?: string;
+	description?: string;
+	image?: ImageMetadata;
+	lang?: string;
+	class?: string;
+	bodyClass?: string;
+	articleType?: 'article' | 'website';
+	publishDate?: Date;
+	modifiedDate?: Date;
+	keywords?: string[];
+	author?: string;
+}
+
+const {
+	title = SITE_TITLE,
+	description = SITE_DESCRIPTION,
+	image,
+	lang = 'pt-br',
+	class: className = '',
+	bodyClass = '',
+	articleType,
+	publishDate,
+	modifiedDate,
+	keywords,
+	author,
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang={lang}>
+	<head>
+		<BaseHead 
+			title={title} 
+			description={description} 
+			image={image}
+			articleType={articleType}
+			publishDate={publishDate}
+			modifiedDate={modifiedDate}
+			keywords={keywords}
+			author={author}
+		/>
+	</head>
+	<body class={`dark ${bodyClass}`}>
+		<Header />
+		<main class={className}>
+			<slot />
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	html {
+		scroll-behavior: smooth;
+	}
+
+	body {
+		font-family: var(--font-family-primary);
+		margin: 0;
+		padding: 0;
+		text-align: left;
+		background: linear-gradient(
+			180deg,
+			var(--color-neutral-50) 0%,
+			var(--color-neutral-100) 100%
+		);
+		background-attachment: fixed;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		color: var(--color-neutral-800);
+		font-size: var(--font-size-lg);
+		line-height: var(--line-height-relaxed);
+		min-height: 100vh;
+		display: flex;
+		flex-direction: column;
+	}
+
+	main {
+		flex-grow: 1;
+		width: 100%;
+		max-width: 1200px;
+		margin: 0 auto;
+		padding: var(--space-8) var(--space-4);
+	}
+
+	/* Modo escuro */
+	body.dark,
+	@media (prefers-color-scheme: dark) {
+		body {
+			background: linear-gradient(
+				180deg,
+				#0f0f0f 0%,
+				#1a1a1a 100%
+			);
+			color: #e5e5e5;
+		}
+	}
+
+	/* Responsividade */
+	@media (max-width: 768px) {
+		body {
+			font-size: var(--font-size-base);
+		}
+		
+		main {
+			padding: var(--space-4) var(--space-2);
+		}
+	}
+
+	/* Accessibility */
+	@media (prefers-reduced-motion: reduce) {
+		html {
+			scroll-behavior: auto;
+		}
+	}
+
+	/* Focus outline melhorado */
+	*:focus-visible {
+		outline: 2px solid var(--color-primary-500);
+		outline-offset: 2px;
+		border-radius: var(--border-radius-sm);
+	}
+
+	/* Seleção de texto */
+	::selection {
+		background-color: var(--color-primary-200);
+		color: var(--color-primary-900);
+	}
+
+	body.dark ::selection,
+	@media (prefers-color-scheme: dark) {
+		::selection {
+			background-color: var(--color-primary-700);
+			color: var(--color-primary-100);
+		}
+	}
+</style>
