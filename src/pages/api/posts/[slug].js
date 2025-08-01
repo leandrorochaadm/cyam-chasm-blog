@@ -1,36 +1,6 @@
 export const prerender = false;
 
-import fs from 'fs';
-import path from 'path';
-
-function formatDate(dateString) {
-	const date = new Date(dateString);
-	return date.toLocaleDateString('en-US', { 
-		month: 'short', 
-		day: 'numeric', 
-		year: 'numeric' 
-	});
-}
-
-function createMarkdownContent(data) {
-	const frontmatter = [];
-	frontmatter.push('---');
-	frontmatter.push(`title: '${data.title.replace(/'/g, "''")}'`);
-	frontmatter.push(`description: '${data.description.replace(/'/g, "''")}'`);
-	frontmatter.push(`pubDate: '${formatDate(data.pubDate)}'`);
-	
-	if (data.updatedDate) {
-		frontmatter.push(`updatedDate: '${formatDate(data.updatedDate)}'`);
-	}
-	
-	if (data.heroImage) {
-		frontmatter.push(`heroImage: '${data.heroImage}'`);
-	}
-	
-	frontmatter.push('---');
-	
-	return frontmatter.join('\n') + '\n\n' + data.content;
-}
+import { GitHubService } from '../../services/github.js';
 
 export async function PUT({ params, request }) {
 	try {
@@ -46,12 +16,16 @@ export async function PUT({ params, request }) {
 				headers: { 'Content-Type': 'application/json' }
 			});
 		}
-		
+
+		// Inicializar serviço GitHub
+		const github = new GitHubService();
+
 		const filename = `${slug}.md`;
-		const filePath = path.join(process.cwd(), 'src', 'content', 'blog', filename);
+		const filePath = `src/content/blog/${filename}`;
 		
-		// Verificar se arquivo existe
-		if (!fs.existsSync(filePath)) {
+		// Buscar arquivo atual
+		const currentFile = await github.getFile(filePath);
+		if (!currentFile) {
 			return new Response(JSON.stringify({
 				message: 'Post não encontrado'
 			}), {
@@ -60,15 +34,24 @@ export async function PUT({ params, request }) {
 			});
 		}
 		
+		// Adicionar updatedDate automaticamente
+		data.updatedDate = new Date().toISOString();
+
 		// Criar conteúdo atualizado
-		const markdownContent = createMarkdownContent(data);
+		const markdownContent = github.createMarkdownContent(data);
 		
-		// Salvar arquivo
-		fs.writeFileSync(filePath, markdownContent, 'utf-8');
+		// Salvar arquivo via GitHub API
+		const result = await github.upsertFile(
+			filePath,
+			markdownContent,
+			`Atualizar post: ${data.title}`,
+			currentFile.sha
+		);
 		
 		return new Response(JSON.stringify({
 			message: 'Post atualizado com sucesso!',
-			slug: slug
+			slug: slug,
+			commitUrl: result.commitUrl
 		}), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' }
@@ -76,8 +59,21 @@ export async function PUT({ params, request }) {
 		
 	} catch (error) {
 		console.error('Erro ao atualizar post:', error);
+
+		// Erro específico do GitHub
+		if (error.message.includes('GitHub API Error')) {
+			return new Response(JSON.stringify({
+				message: 'Erro ao comunicar com GitHub. Verifique as credenciais.',
+				error: error.message
+			}), {
+				status: 502,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
+
 		return new Response(JSON.stringify({
-			message: 'Erro interno do servidor'
+			message: 'Erro interno do servidor',
+			error: process.env.NODE_ENV === 'development' ? error.message : undefined
 		}), {
 			status: 500,
 			headers: { 'Content-Type': 'application/json' }
@@ -88,11 +84,16 @@ export async function PUT({ params, request }) {
 export async function DELETE({ params }) {
 	try {
 		const { slug } = params;
+
+		// Inicializar serviço GitHub
+		const github = new GitHubService();
+
 		const filename = `${slug}.md`;
-		const filePath = path.join(process.cwd(), 'src', 'content', 'blog', filename);
+		const filePath = `src/content/blog/${filename}`;
 		
-		// Verificar se arquivo existe
-		if (!fs.existsSync(filePath)) {
+		// Buscar arquivo atual
+		const currentFile = await github.getFile(filePath);
+		if (!currentFile) {
 			return new Response(JSON.stringify({
 				message: 'Post não encontrado'
 			}), {
@@ -101,12 +102,17 @@ export async function DELETE({ params }) {
 			});
 		}
 		
-		// Deletar arquivo
-		fs.unlinkSync(filePath);
+		// Deletar arquivo via GitHub API
+		const result = await github.deleteFile(
+			filePath,
+			`Deletar post: ${slug}`,
+			currentFile.sha
+		);
 		
 		return new Response(JSON.stringify({
 			message: 'Post deletado com sucesso!',
-			slug: slug
+			slug: slug,
+			commitUrl: result.commitUrl
 		}), {
 			status: 200,
 			headers: { 'Content-Type': 'application/json' }
@@ -114,8 +120,21 @@ export async function DELETE({ params }) {
 		
 	} catch (error) {
 		console.error('Erro ao deletar post:', error);
+
+		// Erro específico do GitHub
+		if (error.message.includes('GitHub API Error')) {
+			return new Response(JSON.stringify({
+				message: 'Erro ao comunicar com GitHub. Verifique as credenciais.',
+				error: error.message
+			}), {
+				status: 502,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
+
 		return new Response(JSON.stringify({
-			message: 'Erro interno do servidor'
+			message: 'Erro interno do servidor',
+			error: process.env.NODE_ENV === 'development' ? error.message : undefined
 		}), {
 			status: 500,
 			headers: { 'Content-Type': 'application/json' }

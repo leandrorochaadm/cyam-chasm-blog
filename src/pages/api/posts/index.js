@@ -1,47 +1,6 @@
 export const prerender = false;
 
-import fs from 'fs';
-import path from 'path';
-
-function generateSlug(title) {
-	return title
-		.toLowerCase()
-		.normalize('NFD')
-		.replace(/[\u0300-\u036f]/g, '') // Remove acentos
-		.replace(/[^a-z0-9\s-]/g, '') // Remove caracteres especiais
-		.replace(/\s+/g, '-') // Substitui espaços por hífens
-		.replace(/-+/g, '-') // Remove hífens duplos
-		.trim('-'); // Remove hífens do início/fim
-}
-
-function formatDate(dateString) {
-	const date = new Date(dateString);
-	return date.toLocaleDateString('en-US', { 
-		month: 'short', 
-		day: 'numeric', 
-		year: 'numeric' 
-	});
-}
-
-function createMarkdownContent(data) {
-	const frontmatter = [];
-	frontmatter.push('---');
-	frontmatter.push(`title: '${data.title.replace(/'/g, "''")}'`);
-	frontmatter.push(`description: '${data.description.replace(/'/g, "''")}'`);
-	frontmatter.push(`pubDate: '${formatDate(data.pubDate)}'`);
-	
-	if (data.updatedDate) {
-		frontmatter.push(`updatedDate: '${formatDate(data.updatedDate)}'`);
-	}
-	
-	if (data.heroImage) {
-		frontmatter.push(`heroImage: '${data.heroImage}'`);
-	}
-	
-	frontmatter.push('---');
-	
-	return frontmatter.join('\n') + '\n\n' + data.content;
-}
+import { GitHubService } from '../../services/github.js';
 
 export async function POST({ request }) {
 	try {
@@ -56,14 +15,18 @@ export async function POST({ request }) {
 				headers: { 'Content-Type': 'application/json' }
 			});
 		}
-		
+
+		// Inicializar serviço GitHub
+		const github = new GitHubService();
+
 		// Gerar slug baseado no título
-		const slug = generateSlug(data.title);
+		const slug = github.generateSlug(data.title);
 		const filename = `${slug}.md`;
-		const filePath = path.join(process.cwd(), 'src', 'content', 'blog', filename);
+		const filePath = `src/content/blog/${filename}`;
 		
 		// Verificar se arquivo já existe
-		if (fs.existsSync(filePath)) {
+		const fileExists = await github.fileExists(filePath);
+		if (fileExists) {
 			return new Response(JSON.stringify({
 				message: 'Já existe um post com este título. Tente um título diferente.'
 			}), {
@@ -73,21 +36,20 @@ export async function POST({ request }) {
 		}
 		
 		// Criar conteúdo do arquivo
-		const markdownContent = createMarkdownContent(data);
+		const markdownContent = github.createMarkdownContent(data);
 		
-		// Criar diretório se não existir
-		const blogDir = path.dirname(filePath);
-		if (!fs.existsSync(blogDir)) {
-			fs.mkdirSync(blogDir, { recursive: true });
-		}
-		
-		// Salvar arquivo
-		fs.writeFileSync(filePath, markdownContent, 'utf-8');
+		// Salvar arquivo via GitHub API
+		const result = await github.upsertFile(
+			filePath,
+			markdownContent,
+			`Criar post: ${data.title}`
+		);
 		
 		return new Response(JSON.stringify({
 			message: 'Post criado com sucesso!',
 			slug: slug,
-			filename: filename
+			filename: filename,
+			commitUrl: result.commitUrl
 		}), {
 			status: 201,
 			headers: { 'Content-Type': 'application/json' }
@@ -95,8 +57,21 @@ export async function POST({ request }) {
 		
 	} catch (error) {
 		console.error('Erro ao criar post:', error);
+
+		// Erro específico do GitHub
+		if (error.message.includes('GitHub API Error')) {
+			return new Response(JSON.stringify({
+				message: 'Erro ao comunicar com GitHub. Verifique as credenciais.',
+				error: error.message
+			}), {
+				status: 502,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
+
 		return new Response(JSON.stringify({
-			message: 'Erro interno do servidor'
+			message: 'Erro interno do servidor',
+			error: process.env.NODE_ENV === 'development' ? error.message : undefined
 		}), {
 			status: 500,
 			headers: { 'Content-Type': 'application/json' }
