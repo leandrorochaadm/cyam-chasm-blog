@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { GitHubService } from '../../services/github.js';
+import { isGitHubConfigured, generateSlug, fileExists, createMarkdownContent, upsertFile } from '../../services/github';
 
 export async function POST({ request }) {
 	try {
@@ -16,17 +16,25 @@ export async function POST({ request }) {
 			});
 		}
 
-		// Inicializar serviço GitHub
-		const github = new GitHubService();
+				// Verificar se GitHub está configurado
+		if (!isGitHubConfigured()) {
+			return new Response(JSON.stringify({
+				message: 'GitHub API não configurado. Configure as variáveis GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO.',
+				error: 'GITHUB_NOT_CONFIGURED'
+			}), {
+				status: 503,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
 
 		// Gerar slug baseado no título
-		const slug = github.generateSlug(data.title);
+		const slug = generateSlug(data.title);
 		const filename = `${slug}.md`;
 		const filePath = `src/content/blog/${filename}`;
 		
 		// Verificar se arquivo já existe
-		const fileExists = await github.fileExists(filePath);
-		if (fileExists) {
+		const exists = await fileExists(filePath);
+		if (exists) {
 			return new Response(JSON.stringify({
 				message: 'Já existe um post com este título. Tente um título diferente.'
 			}), {
@@ -36,10 +44,10 @@ export async function POST({ request }) {
 		}
 		
 		// Criar conteúdo do arquivo
-		const markdownContent = github.createMarkdownContent(data);
+		const markdownContent = createMarkdownContent(data);
 		
 		// Salvar arquivo via GitHub API
-		const result = await github.upsertFile(
+		const result = await upsertFile(
 			filePath,
 			markdownContent,
 			`Criar post: ${data.title}`

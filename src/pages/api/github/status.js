@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { GitHubService } from '../../services/github.js';
+import { isGitHubConfigured, checkRateLimit, fileExists } from '../../services/github';
 
 /**
  * Endpoint para verificar status da configuração GitHub
@@ -30,11 +30,21 @@ export async function GET() {
 			});
 		}
 
-		// Tentar inicializar o serviço
-		const github = new GitHubService();
+				// Verificar se está configurado
+		if (!isGitHubConfigured()) {
+			return new Response(JSON.stringify({
+				status: 'error',
+				message: 'Serviço GitHub não configurado',
+				environment: envCheck,
+				configured: false
+			}), {
+				status: 500,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
 		
 		// Verificar rate limits (teste de conectividade)
-		const rateLimit = await github.checkRateLimit();
+		const rateLimit = await checkRateLimit();
 		
 		if (!rateLimit) {
 			return new Response(JSON.stringify({
@@ -49,7 +59,7 @@ export async function GET() {
 
 		// Verificar se consegue acessar o repositório
 		const testPath = 'README.md';
-		const canAccessRepo = await github.fileExists(testPath);
+		const canAccessRepo = await fileExists(testPath);
 
 		return new Response(JSON.stringify({
 			status: 'success',

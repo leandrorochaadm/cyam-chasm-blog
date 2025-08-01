@@ -1,6 +1,6 @@
 export const prerender = false;
 
-import { GitHubService } from '../../services/github.js';
+import { isGitHubConfigured, getFile, createMarkdownContent, upsertFile, deleteFile } from '../../services/github';
 
 export async function PUT({ params, request }) {
 	try {
@@ -17,14 +17,22 @@ export async function PUT({ params, request }) {
 			});
 		}
 
-		// Inicializar serviço GitHub
-		const github = new GitHubService();
+				// Verificar se GitHub está configurado
+		if (!isGitHubConfigured()) {
+			return new Response(JSON.stringify({
+				message: 'GitHub API não configurado. Configure as variáveis GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO.',
+				error: 'GITHUB_NOT_CONFIGURED'
+			}), {
+				status: 503,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
 
 		const filename = `${slug}.md`;
 		const filePath = `src/content/blog/${filename}`;
 		
 		// Buscar arquivo atual
-		const currentFile = await github.getFile(filePath);
+		const currentFile = await getFile(filePath);
 		if (!currentFile) {
 			return new Response(JSON.stringify({
 				message: 'Post não encontrado'
@@ -36,12 +44,12 @@ export async function PUT({ params, request }) {
 		
 		// Adicionar updatedDate automaticamente
 		data.updatedDate = new Date().toISOString();
-
+		
 		// Criar conteúdo atualizado
-		const markdownContent = github.createMarkdownContent(data);
+		const markdownContent = createMarkdownContent(data);
 		
 		// Salvar arquivo via GitHub API
-		const result = await github.upsertFile(
+		const result = await upsertFile(
 			filePath,
 			markdownContent,
 			`Atualizar post: ${data.title}`,
@@ -85,14 +93,22 @@ export async function DELETE({ params }) {
 	try {
 		const { slug } = params;
 
-		// Inicializar serviço GitHub
-		const github = new GitHubService();
+				// Verificar se GitHub está configurado
+		if (!isGitHubConfigured()) {
+			return new Response(JSON.stringify({
+				message: 'GitHub API não configurado. Configure as variáveis GITHUB_TOKEN, GITHUB_OWNER, GITHUB_REPO.',
+				error: 'GITHUB_NOT_CONFIGURED'
+			}), {
+				status: 503,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
 
 		const filename = `${slug}.md`;
 		const filePath = `src/content/blog/${filename}`;
 		
 		// Buscar arquivo atual
-		const currentFile = await github.getFile(filePath);
+		const currentFile = await getFile(filePath);
 		if (!currentFile) {
 			return new Response(JSON.stringify({
 				message: 'Post não encontrado'
@@ -103,7 +119,7 @@ export async function DELETE({ params }) {
 		}
 		
 		// Deletar arquivo via GitHub API
-		const result = await github.deleteFile(
+		const result = await deleteFile(
 			filePath,
 			`Deletar post: ${slug}`,
 			currentFile.sha
