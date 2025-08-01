@@ -1,0 +1,34 @@
+# Dependências
+node_modules
+.pnpm
+.npm
+
+# Logs
+*.log
+logs
+
+# Arquivos de desenvolvimento
+.astro
+.vscode
+.idea
+
+# Arquivos temporários
+.tmp
+.temp
+
+# Cache
+.cache
+
+# Arquivos específicos do sistema
+.DS_Store
+Thumbs.db
+
+# Variáveis de ambiente
+.env
+.env.local
+.env.production.local
+.env.local
+
+# README específicos
+README.md
+src/pages/admin/README.md
