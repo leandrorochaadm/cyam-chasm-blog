@@ -200,7 +200,7 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 
 	/* Citações */
 	.prose blockquote {
-		border-left: var(--border-width-4) solid var(--color-primary-500);
+		border-left: var(--border-width-4) solid var(--color-neutral-400);
 		padding: var(--space-4) var(--space-6);
 		margin: var(--space-8) 0;
 		background: var(--color-primary-50);
@@ -328,12 +328,18 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 		}
 
 		.prose blockquote {
-			background: var(--color-primary-100);
-			color: var(--color-neutral-700);
+			background: var(--color-neutral-700);
+			color: var(--color-neutral-500);
+			border-left-color: var(--color-neutral-500);
+		}
+
+		.prose blockquote strong,
+		.prose blockquote b {
+			color: var(--color-neutral-50);
 		}
 
 		.prose blockquote::before {
-			color: var(--color-primary-400);
+			color: var(--color-primary-300);
 		}
 
 		.prose table tbody tr:hover {
