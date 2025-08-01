@@ -1,10 +1,9 @@
 ---
 import { Image } from "astro:assets";
 import { getCollection } from "astro:content";
-import BaseHead from "../../components/BaseHead.astro";
-import Footer from "../../components/Footer.astro";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import Card from "../../components/ui/Card.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
-import Header from "../../components/Header.astro";
 import { SITE_DESCRIPTION, SITE_TITLE } from "../../consts";
 
 const posts = (await getCollection("blog")).sort(
@@ -12,124 +11,277 @@ const posts = (await getCollection("blog")).sort(
 );
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-		<style>
-			main {
-				width: 960px;
-			}
-			ul {
-				display: flex;
-				flex-wrap: wrap;
-				gap: 2rem;
-				list-style-type: none;
-				margin: 0;
-				padding: 0;
-			}
-			ul li {
-				width: calc(50% - 1rem);
-			}
-			ul li * {
-				text-decoration: none;
-				transition: 0.2s ease;
-			}
-			ul li:first-child {
-				width: 100%;
-				margin-bottom: 1rem;
-				text-align: center;
-			}
-			ul li:first-child img {
-				width: 100%;
-			}
-			ul li:first-child .title {
-				font-size: 2.369rem;
-			}
-			ul li img {
-				margin-bottom: 0.5rem;
-				border-radius: 12px;
-			}
-			ul li a {
-				display: block;
-			}
-			.title {
-				margin: 0;
-				color: var(--color-neutral-900);
-				line-height: 1;
-			}
-			.date {
-				margin: 0;
-				color: var(--color-neutral-600);
-			}
-			ul li a:hover h4,
-			ul li a:hover .date {
-				color: var(--color-primary-600);
-			}
+<BaseLayout
+	title={`Blog - ${SITE_TITLE}`}
+	description={SITE_DESCRIPTION}
+	class="blog-page"
+>
+	<section class="blog-header">
+		<div class="blog-header-content">
+			<h1 class="blog-title">Blog</h1>
+			<p class="blog-description">
+				Artigos sobre tecnologia, desenvolvimento e muito mais
+			</p>
+		</div>
+	</section>
 
-			/* Dark mode */
-			@media (prefers-color-scheme: dark) {
-				.title {
-					color: var(--color-neutral-900);
-				}
-				.date {
-					color: var(--color-neutral-600);
-				}
-				ul li a:hover h4,
-				ul li a:hover .date {
-					color: var(--color-primary-400);
-				}
-			}
-			ul a:hover img {
-				box-shadow: var(--box-shadow);
-			}
-			@media (max-width: 720px) {
-				ul {
-					gap: 0.5em;
-				}
-				ul li {
-					width: 100%;
-					text-align: center;
-				}
-				ul li:first-child {
-					margin-bottom: 0;
-				}
-				ul li:first-child .title {
-					font-size: 1.563em;
-				}
-			}
-		</style>
-	</head>
-	<body>
-		<Header />
-		<main>
-			<section>
-				<ul>
-					{
-						posts.map((post) => (
-							<li>
-								<a href={`/blog/${post.id}/`}>
-									{post.data.heroImage && (
-										<Image
-											width={720}
-											height={360}
-											src={post.data.heroImage}
-											alt=""
-										/>
-									)}
-									<h4 class="title">{post.data.title}</h4>
-									<p class="date">
-										<FormattedDate
-											date={post.data.pubDate}
-										/>
-									</p>
-								</a>
-							</li>
-						))
-					}
-				</ul>
-			</section>
-		</main>
-		<Footer />
-	</body>
-</html>
+	<section class="posts-grid">
+		{
+			posts.map((post, index) => (
+				<Card
+					variant="elevated"
+					padding="lg"
+					class={`post-card ${index === 0 ? "featured-post" : ""}`}
+				>
+					<a href={`/blog/${post.id}/`} class="post-link">
+						{post.data.heroImage && (
+							<div class="post-image">
+								<Image
+									width={index === 0 ? 800 : 400}
+									height={index === 0 ? 400 : 200}
+									src={post.data.heroImage}
+									alt={`Imagem do artigo: ${post.data.title}`}
+									loading={index === 0 ? "eager" : "lazy"}
+									quality={85}
+								/>
+							</div>
+						)}
+						<div class="post-content">
+							<h3 class="post-title">{post.data.title}</h3>
+							<p class="post-description">
+								{post.data.description}
+							</p>
+							<div class="post-meta">
+								<FormattedDate date={post.data.pubDate} />
+							</div>
+						</div>
+					</a>
+				</Card>
+			))
+		}
+	</section>
+</BaseLayout>
+
+<style>
+	.blog-page {
+		padding-top: var(--space-4);
+	}
+
+	/* Blog Header */
+	.blog-header {
+		text-align: center;
+		margin-bottom: var(--space-12);
+	}
+
+	.blog-header-content {
+		max-width: 800px;
+		margin: 0 auto;
+		padding-bottom: var(--space-6);
+		border-bottom: var(--border-width-2) solid var(--color-neutral-300);
+	}
+
+	.blog-title {
+		font-size: clamp(var(--font-size-4xl), 6vw, var(--font-size-5xl));
+		font-weight: var(--font-weight-extrabold);
+		color: var(--color-neutral-900);
+		margin-bottom: var(--space-4);
+		line-height: var(--line-height-tight);
+	}
+
+	.blog-description {
+		font-size: var(--font-size-xl);
+		color: var(--color-neutral-600);
+		margin: 0;
+		line-height: var(--line-height-relaxed);
+	}
+
+	/* Posts Grid */
+	.posts-grid {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+		gap: var(--space-6);
+		max-width: 1200px;
+		margin: 0 auto;
+	}
+
+	/* Featured Post (primeiro post) */
+	.featured-post {
+		grid-column: 1 / -1;
+		max-width: 800px;
+		margin: 0 auto var(--space-8);
+	}
+
+	/* Post Cards - Exatamente igual aos cards elevated */
+	.post-card {
+		/* Base card styles */
+		display: block;
+		border-radius: var(--border-radius-xl);
+		transition: var(--transition-all);
+		position: relative;
+		overflow: hidden;
+		word-wrap: break-word;
+		overflow-wrap: break-word;
+		height: fit-content;
+
+		/* Elevated variant styles */
+		background: var(--color-neutral-50);
+		box-shadow: var(--shadow-lg);
+		border: none;
+
+		/* Padding lg */
+		padding: var(--space-6);
+	}
+
+	.post-link {
+		display: block;
+		text-decoration: none;
+		color: inherit;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		/* Remove padding já que está no card */
+		margin: calc(var(--space-6) * -1);
+		padding: var(--space-6);
+		border-radius: var(--border-radius-xl);
+	}
+
+	.post-image {
+		width: 100%;
+		margin-bottom: var(--space-4);
+		border-radius: var(--border-radius-lg);
+		overflow: hidden;
+		aspect-ratio: 2/1;
+	}
+
+	.post-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: var(--transition-all);
+	}
+
+	.post-content {
+		flex-grow: 1;
+		display: flex;
+		flex-direction: column;
+	}
+
+	.post-title {
+		font-size: var(--font-size-xl);
+		font-weight: var(--font-weight-semibold);
+		color: var(--color-neutral-900);
+		margin-bottom: var(--space-3);
+		line-height: var(--line-height-tight);
+		transition: var(--transition-colors);
+	}
+
+	.featured-post .post-title {
+		font-size: var(--font-size-3xl);
+		text-align: center;
+	}
+
+	.post-description {
+		color: var(--color-neutral-700);
+		margin-bottom: var(--space-4);
+		line-height: var(--line-height-relaxed);
+		flex-grow: 1;
+		font-size: var(--font-size-base);
+	}
+
+	.featured-post .post-description {
+		font-size: var(--font-size-lg);
+		text-align: center;
+	}
+
+	.post-meta {
+		font-size: var(--font-size-sm);
+		color: var(--color-neutral-600);
+		margin-top: auto;
+	}
+
+	.featured-post .post-meta {
+		text-align: center;
+		font-size: var(--font-size-base);
+	}
+
+	/* Hover Effects - Exato do card elevated */
+	.post-card:hover {
+		box-shadow: var(--shadow-xl);
+		transform: translateY(-4px);
+	}
+
+	.post-link:hover .post-title {
+		color: var(--color-primary-600);
+	}
+
+	.post-link:hover .post-image img {
+		transform: scale(1.05);
+	}
+
+	/* Dark mode */
+	@media (prefers-color-scheme: dark) {
+		.blog-header-content {
+			border-bottom-color: var(--color-neutral-400);
+		}
+
+		.blog-title {
+			color: var(--color-neutral-900);
+		}
+
+		.blog-description {
+			color: var(--color-neutral-700);
+		}
+
+		.post-card {
+			background: var(--color-neutral-200);
+		}
+
+		.post-title {
+			color: var(--color-neutral-900);
+		}
+
+		.post-description {
+			color: var(--color-neutral-800);
+		}
+
+		.post-meta {
+			color: var(--color-neutral-600);
+		}
+
+		.post-link:hover .post-title {
+			color: var(--color-primary-400);
+		}
+	}
+
+	/* Responsividade */
+	@media (max-width: 768px) {
+		.posts-grid {
+			grid-template-columns: 1fr;
+			gap: var(--space-4);
+		}
+
+		.featured-post {
+			margin-bottom: var(--space-6);
+		}
+
+		.post-image {
+			aspect-ratio: 16/9;
+		}
+	}
+
+	@media (max-width: 480px) {
+		.blog-header-content {
+			padding-bottom: var(--space-4);
+		}
+
+		.blog-title {
+			margin-bottom: var(--space-3);
+		}
+
+		.featured-post .post-title,
+		.featured-post .post-description,
+		.featured-post .post-meta {
+			text-align: left;
+		}
+	}
+</style>
