@@ -146,7 +146,7 @@ export async function PUT({ params, request }) {
 			});
 		}
 
-		const filename = `${slug}.md`;
+				const filename = `${slug}.md`;
 		const filePath = `src/content/blog/${filename}`;
 		
 		// Buscar arquivo atual
