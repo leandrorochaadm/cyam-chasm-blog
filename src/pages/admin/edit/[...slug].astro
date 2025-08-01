@@ -503,6 +503,9 @@ try {
 			// Inicializar TinyMCE
 			tinymce.init({
 				selector: "#content",
+				license_key: "gpl",
+				language: "pt_BR",
+				language_url: "/js/tinymce/langs/pt_BR.js",
 				height: 500,
 				menubar: false,
 				branding: false,
@@ -582,12 +585,16 @@ try {
 						font-weight: 600; 
 					}
 				`,
-				language: "pt_BR",
 				setup: function (ed) {
 					editor = ed;
 					// Definir o conteúdo inicial convertido de markdown para HTML
 					ed.on("init", function () {
 						ed.setContent(initialHtmlContent);
+					});
+					// Sincronizar conteúdo automaticamente ao digitar
+					ed.on("input keyup paste", function () {
+						const htmlContent = ed.getContent();
+						document.getElementById("content").value = htmlContent;
 					});
 				},
 				init_instance_callback: function (ed) {
@@ -607,6 +614,23 @@ try {
 					const submitBtn = form.querySelector(
 						'button[type="submit"]',
 					);
+
+					// Sincronizar conteúdo do TinyMCE com o textarea antes da validação
+					if (editor) {
+						const htmlContent = editor.getContent();
+						document.getElementById("content").value = htmlContent;
+					}
+
+					// Verificar se o conteúdo foi preenchido
+					const contentTextarea = document.getElementById("content");
+					if (!contentTextarea.value.trim()) {
+						messageContainer.innerHTML = `
+							<div class="error-message">
+								O campo de conteúdo é obrigatório.
+							</div>
+						`;
+						return;
+					}
 
 					// Loading state
 					form.classList.add("loading");
