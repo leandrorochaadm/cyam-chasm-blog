@@ -1,8 +1,9 @@
 ---
 title: 'aaaa'
 description: 'Lorem ipsum dolor sit amet'
-pubDate: 'Jul 29, 2025'
-updatedDate: 'Jul 30, 2025'
+pubDate: 'Jul 28, 2025'
+updatedDate: 'Jul 29, 2025'
+heroImage: '../../assets/1754052626483-Arte_Tio_Zito.webp'
 ---
 
 fdsafs
@@ -16,6 +17,6 @@ asdfads
 
 \`\`\`html
 
-<h1>titlte</h1>
+# titlte
 
 \`\`\`

@@ -198,12 +198,37 @@ try {
 			}
 
 			.error-message {
-				background: #f8d7da;
-				color: #721c24;
-				padding: 0.75rem;
-				border-radius: 6px;
-				margin-bottom: 1rem;
-				border: 1px solid #f5c6cb;
+				background: linear-gradient(135deg, #ff4757 0%, #ff3742 100%);
+				color: white;
+				padding: 1.2rem 1.5rem;
+				border-radius: 12px;
+				margin-bottom: 1.5rem;
+				border: 3px solid #ff1744;
+				box-shadow:
+					0 8px 25px rgba(255, 23, 68, 0.4),
+					0 0 0 4px rgba(255, 23, 68, 0.15),
+					inset 0 1px 0 rgba(255, 255, 255, 0.2);
+				animation:
+					errorShake 0.6s ease-in-out,
+					errorGlow 2s ease-in-out infinite;
+				font-weight: 700;
+				font-size: 1.1rem;
+				text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+				position: relative;
+				transform: translateZ(0);
+			}
+
+			.error-message::before {
+				content: "";
+				position: absolute;
+				top: -2px;
+				left: -2px;
+				right: -2px;
+				bottom: -2px;
+				background: linear-gradient(45deg, #ff1744, #ff4757, #ff1744);
+				border-radius: 14px;
+				z-index: -1;
+				animation: borderPulse 1.5s ease-in-out infinite;
 			}
 
 			.success-message {
@@ -287,6 +312,75 @@ try {
 
 			.upload-status.loading {
 				color: #6c757d;
+			}
+
+			.field-error {
+				border-color: #ff1744 !important;
+				box-shadow:
+					0 0 0 4px rgba(255, 23, 68, 0.3) !important,
+					0 0 15px rgba(255, 23, 68, 0.2) !important;
+				animation: fieldErrorPulse 1s ease-in-out infinite;
+				background-color: rgba(255, 23, 68, 0.05) !important;
+			}
+
+			@keyframes fieldErrorPulse {
+				0%,
+				100% {
+					box-shadow:
+						0 0 0 4px rgba(255, 23, 68, 0.3),
+						0 0 15px rgba(255, 23, 68, 0.2);
+				}
+				50% {
+					box-shadow:
+						0 0 0 6px rgba(255, 23, 68, 0.5),
+						0 0 25px rgba(255, 23, 68, 0.4);
+				}
+			}
+
+			@keyframes errorShake {
+				0%,
+				100% {
+					transform: translateX(0);
+				}
+				10%,
+				30%,
+				50%,
+				70%,
+				90% {
+					transform: translateX(-3px);
+				}
+				20%,
+				40%,
+				60%,
+				80% {
+					transform: translateX(3px);
+				}
+			}
+
+			@keyframes errorGlow {
+				0%,
+				100% {
+					box-shadow:
+						0 8px 25px rgba(255, 23, 68, 0.4),
+						0 0 0 4px rgba(255, 23, 68, 0.15),
+						inset 0 1px 0 rgba(255, 255, 255, 0.2);
+				}
+				50% {
+					box-shadow:
+						0 12px 35px rgba(255, 23, 68, 0.6),
+						0 0 0 6px rgba(255, 23, 68, 0.25),
+						inset 0 1px 0 rgba(255, 255, 255, 0.3);
+				}
+			}
+
+			@keyframes borderPulse {
+				0%,
+				100% {
+					opacity: 0.8;
+				}
+				50% {
+					opacity: 1;
+				}
 			}
 		</style>
 	</head>
@@ -393,7 +487,7 @@ try {
 
 						<div class="form-group">
 							<label for="heroImage" class="form-label"
-								>Imagem de Destaque</label
+								>Imagem de Destaque *</label
 							>
 							<div class="image-upload-container">
 								<input
@@ -403,6 +497,7 @@ try {
 									class="form-input"
 									value={originalHeroImage || ""}
 									placeholder="../../assets/blog-placeholder-1.jpg"
+									required
 									readonly
 								/>
 								<div class="upload-section">
@@ -427,7 +522,8 @@ try {
 							<div class="help-text">
 								Selecione uma imagem do seu computador (será
 								automaticamente otimizada e convertida para
-								WebP) ou digite o caminho manualmente (opcional)
+								WebP) ou digite o caminho manualmente
+								(obrigatório)
 							</div>
 						</div>
 
@@ -621,14 +717,50 @@ try {
 						document.getElementById("content").value = htmlContent;
 					}
 
+					// Limpar estilos de erro anteriores
+					document
+						.querySelectorAll(".field-error")
+						.forEach((field) => {
+							field.classList.remove("field-error");
+						});
+
 					// Verificar se o conteúdo foi preenchido
 					const contentTextarea = document.getElementById("content");
+					const heroImageInput = document.getElementById("heroImage");
+
 					if (!contentTextarea.value.trim()) {
 						messageContainer.innerHTML = `
 							<div class="error-message">
-								O campo de conteúdo é obrigatório.
+								⚠️ O campo de conteúdo é obrigatório.
 							</div>
 						`;
+						// Focar no editor TinyMCE
+						if (editor) {
+							editor.focus();
+						}
+						// Scroll para o topo do formulário
+						messageContainer.scrollIntoView({
+							behavior: "smooth",
+							block: "center",
+						});
+						return;
+					}
+
+					if (!heroImageInput.value.trim()) {
+						messageContainer.innerHTML = `
+							<div class="error-message">
+								🖼️ O campo de imagem de destaque é obrigatório.
+							</div>
+						`;
+						// Destacar o campo com erro
+						heroImageInput.classList.add("field-error");
+						// Focar no campo
+						heroImageInput.focus();
+						// Scroll para o campo
+						heroImageInput.scrollIntoView({
+							behavior: "smooth",
+							block: "center",
+						});
 						return;
 					}
 
@@ -651,7 +783,7 @@ try {
 							pubDate: formData.get("pubDate"),
 							updatedDate:
 								formData.get("updatedDate") || undefined,
-							heroImage: formData.get("heroImage") || undefined,
+							heroImage: formData.get("heroImage"),
 							content: markdownContent,
 						};
 
@@ -711,9 +843,22 @@ try {
 					const htmlContent = editor ? editor.getContent() : "";
 
 					if (!title || !htmlContent) {
-						alert(
-							"Preencha pelo menos o título e conteúdo para visualizar",
-						);
+						const messageContainer =
+							document.getElementById("message-container");
+						messageContainer.innerHTML = `
+									<div class="error-message">
+										👁️ Preencha pelo menos o título e conteúdo para visualizar
+									</div>
+								`;
+						if (!title) {
+							document.getElementById("title").focus();
+						} else if (editor) {
+							editor.focus();
+						}
+						messageContainer.scrollIntoView({
+							behavior: "smooth",
+							block: "center",
+						});
 						return;
 					}
 
