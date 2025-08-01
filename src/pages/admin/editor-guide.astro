@@ -1,0 +1,420 @@
+---
+import BaseHead from '../../components/BaseHead.astro';
+import Header from '../../components/Header.astro';
+import Footer from '../../components/Footer.astro';
+import { SITE_TITLE, SITE_DESCRIPTION } from '../../consts';
+---
+
+<!doctype html>
+<html lang="pt-br">
+	<head>
+		<BaseHead title={`Guia do Editor - Admin - ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			.admin-container {
+				max-width: 1200px;
+				margin: 0 auto;
+				padding: 2rem;
+			}
+			
+			.admin-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 2rem;
+				padding-bottom: 1rem;
+				border-bottom: 2px solid #e1e5e9;
+			}
+			
+			.admin-title {
+				font-size: 2rem;
+				font-weight: bold;
+				color: #2c3e50;
+			}
+			
+			.btn {
+				display: inline-block;
+				padding: 0.75rem 1.5rem;
+				border-radius: 8px;
+				text-decoration: none;
+				font-weight: 600;
+				transition: all 0.3s ease;
+				border: none;
+				cursor: pointer;
+			}
+			
+			.btn-secondary {
+				background: #f8f9fa;
+				color: #495057;
+				border: 1px solid #dee2e6;
+			}
+			
+			.btn-secondary:hover {
+				background: #e9ecef;
+			}
+			
+			.guide-container {
+				background: white;
+				border-radius: 12px;
+				padding: 2rem;
+				box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+				border: 1px solid #e1e5e9;
+			}
+			
+			.section {
+				margin-bottom: 3rem;
+			}
+			
+			.section h2 {
+				color: #2c3e50;
+				border-bottom: 2px solid #667eea;
+				padding-bottom: 0.5rem;
+				margin-bottom: 1.5rem;
+			}
+			
+			.section h3 {
+				color: #495057;
+				margin-top: 2rem;
+				margin-bottom: 1rem;
+			}
+			
+			.example {
+				background: #f8f9fa;
+				border: 1px solid #dee2e6;
+				border-radius: 6px;
+				padding: 1rem;
+				margin: 1rem 0;
+				font-family: 'Courier New', monospace;
+				font-size: 0.9rem;
+			}
+			
+			.result {
+				background: #d4edda;
+				border: 1px solid #c3e6cb;
+				border-radius: 6px;
+				padding: 1rem 0;
+				margin: 1rem 0;
+			}
+			
+			.grid {
+				display: grid;
+				grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+				gap: 2rem;
+				margin: 2rem 0;
+			}
+			
+			.card {
+				background: #f8f9fa;
+				border: 1px solid #dee2e6;
+				border-radius: 8px;
+				padding: 1.5rem;
+			}
+			
+			.card h4 {
+				color: #667eea;
+				margin-top: 0;
+			}
+			
+			table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 1rem 0;
+			}
+			
+			th, td {
+				border: 1px solid #dee2e6;
+				padding: 0.75rem;
+				text-align: left;
+			}
+			
+			th {
+				background: #f8f9fa;
+				font-weight: 600;
+			}
+			
+			code {
+				background: #f8f9fa;
+				padding: 0.2rem 0.4rem;
+				border-radius: 3px;
+				font-family: 'Courier New', monospace;
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="admin-container">
+				<div class="admin-header">
+					<h1 class="admin-title">Guia do Editor Markdown</h1>
+					<a href="/admin" class="btn btn-secondary">
+						← Voltar ao Admin
+					</a>
+				</div>
+				
+				<div class="guide-container">
+					<div class="section">
+						<h2>📝 Formatação Básica</h2>
+						
+						<h3>Títulos</h3>
+						<div class="example">
+# Título Principal (H1)
+## Título de Seção (H2)  
+### Subtítulo (H3)
+#### Sub-subtítulo (H4)
+						</div>
+						
+						<h3>Texto</h3>
+						<div class="example">
+**Texto em negrito**
+*Texto em itálico*
+***Negrito e itálico***
+`código inline`
+						</div>
+						
+						<h3>Links</h3>
+						<div class="example">
+[Texto do link](https://exemplo.com)
+[Link interno](/admin)
+						</div>
+					</div>
+					
+					<div class="section">
+						<h2>📋 Listas</h2>
+						
+						<h3>Lista com Marcadores</h3>
+						<div class="example">
+- Item 1
+- Item 2
+  - Sub-item A
+  - Sub-item B
+- Item 3
+						</div>
+						
+						<h3>Lista Numerada</h3>
+						<div class="example">
+1. Primeiro item
+2. Segundo item
+   1. Sub-item numerado
+   2. Outro sub-item
+3. Terceiro item
+						</div>
+					</div>
+					
+					<div class="section">
+						<h2>💻 Código</h2>
+						
+						<h3>Código Inline</h3>
+						<div class="example">
+Use `console.log()` para debug.
+						</div>
+						
+						<h3>Blocos de Código</h3>
+						<div class="example">
+```javascript<br/>
+function exemplo() &lcub;<br/>
+&nbsp;&nbsp;console.log("Olá mundo!");<br/>
+&rcub;<br/>
+```
+						</div>
+					</div>
+					
+					<div class="section">
+						<h2>📊 Tabelas</h2>
+						
+						<div class="example">
+| Coluna 1 | Coluna 2 | Coluna 3 |
+|----------|----------|----------|
+| Dados A  | Dados B  | Dados C  |
+| Dados D  | Dados E  | Dados F  |
+						</div>
+					</div>
+					
+					<div class="section">
+						<h2>💬 Citações</h2>
+						
+						<div class="example">
+> Esta é uma citação importante.
+> 
+> Pode ter múltiplas linhas.
+						</div>
+					</div>
+					
+					<div class="section">
+						<h2>🎨 Componentes Especiais</h2>
+						
+						<h3>Callouts Informativos</h3>
+						<div class="example">
+&lt;div class="callout callout-info"&gt;
+  &lt;div class="callout-title"&gt;💡 Informação&lt;/div&gt;
+  Esta é uma dica importante.
+&lt;/div&gt;
+						</div>
+						
+						<div class="grid">
+							<div class="card">
+								<h4>Info (Azul)</h4>
+								<code>callout-info</code>
+								<p>Para dicas e informações gerais</p>
+							</div>
+							<div class="card">
+								<h4>Warning (Amarelo)</h4>
+								<code>callout-warning</code>
+								<p>Para avisos e precauções</p>
+							</div>
+							<div class="card">
+								<h4>Danger (Vermelho)</h4>
+								<code>callout-danger</code>
+								<p>Para alertas críticos</p>
+							</div>
+							<div class="card">
+								<h4>Success (Verde)</h4>
+								<code>callout-success</code>
+								<p>Para confirmações e sucessos</p>
+							</div>
+						</div>
+						
+						<h3>Badges</h3>
+						<div class="example">
+&lt;span class="badge badge-primary"&gt;Novo&lt;/span&gt;
+&lt;span class="badge badge-success"&gt;Estável&lt;/span&gt;
+&lt;span class="badge badge-warning"&gt;Beta&lt;/span&gt;
+						</div>
+						
+						<h3>Botões</h3>
+						<div class="example">
+&lt;a href="#" class="btn-link"&gt;Botão de Ação&lt;/a&gt;
+						</div>
+						
+						<h3>Cards Informativos</h3>
+						<div class="example">
+&lt;div class="info-card"&gt;
+  &lt;h3&gt;🎯 Título do Card&lt;/h3&gt;
+  &lt;p&gt;Conteúdo do card aqui...&lt;/p&gt;
+&lt;/div&gt;
+						</div>
+						
+						<h3>Timeline</h3>
+						<div class="example">
+&lt;div class="timeline"&gt;
+  &lt;div class="timeline-item"&gt;
+    &lt;div class="timeline-date"&gt;Janeiro 2025&lt;/div&gt;
+    &lt;h4&gt;Evento Importante&lt;/h4&gt;
+    &lt;p&gt;Descrição do evento...&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+						</div>
+						
+						<h3>Acordeão</h3>
+						<div class="example">
+&lt;div class="accordion"&gt;
+  &lt;button class="accordion-header"&gt;Título&lt;/button&gt;
+  &lt;div class="accordion-content"&gt;
+    &lt;p&gt;Conteúdo que expande...&lt;/p&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+						</div>
+						
+						<h3>Texto Destacado</h3>
+						<div class="example">
+&lt;span class="text-highlight"&gt;texto destacado&lt;/span&gt;
+						</div>
+						
+						<h3>Listas com Emojis</h3>
+						<div class="example">
+&lt;ul class="emoji-list"&gt;
+  &lt;li data-emoji="🚀"&gt;Item com emoji&lt;/li&gt;
+  &lt;li data-emoji="⚡"&gt;Outro item&lt;/li&gt;
+&lt;/ul&gt;
+						</div>
+					</div>
+					
+					<div class="section">
+						<h2>📋 Referência Rápida</h2>
+						
+						<table>
+							<thead>
+								<tr>
+									<th>Elemento</th>
+									<th>Sintaxe Markdown</th>
+									<th>Resultado</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr>
+									<td>Negrito</td>
+									<td><code>**texto**</code></td>
+									<td><strong>texto</strong></td>
+								</tr>
+								<tr>
+									<td>Itálico</td>
+									<td><code>*texto*</code></td>
+									<td><em>texto</em></td>
+								</tr>
+								<tr>
+									<td>Código</td>
+									<td><code>`código`</code></td>
+									<td><code>código</code></td>
+								</tr>
+								<tr>
+									<td>Link</td>
+									<td><code>[texto](url)</code></td>
+									<td>Link clicável</td>
+								</tr>
+								<tr>
+									<td>Título H2</td>
+									<td><code>## Título</code></td>
+									<td>Título grande</td>
+								</tr>
+								<tr>
+									<td>Lista</td>
+									<td><code>- item</code></td>
+									<td>• item</td>
+								</tr>
+								<tr>
+									<td>Citação</td>
+									<td><code>> texto</code></td>
+									<td>Texto citado</td>
+								</tr>
+							</tbody>
+						</table>
+					</div>
+					
+					<div class="section">
+						<h2>💡 Dicas de Uso</h2>
+						
+						<div class="grid">
+							<div class="card">
+								<h4>🎯 Preview</h4>
+								<p>Sempre use o botão "Visualizar" antes de publicar para ver como ficará o resultado final.</p>
+							</div>
+							<div class="card">
+								<h4>📱 Responsivo</h4>
+								<p>Todos os componentes são responsivos e funcionam bem em dispositivos móveis.</p>
+							</div>
+							<div class="card">
+								<h4>🎨 Cores</h4>
+								<p>Os componentes usam as cores do tema automaticamente. Azul para links, verde para sucesso, etc.</p>
+							</div>
+							<div class="card">
+								<h4>⚡ Performance</h4>
+								<p>Os componentes são otimizados e não afetam a velocidade de carregamento do site.</p>
+							</div>
+						</div>
+					</div>
+					
+					<div class="section">
+						<h2>🔗 Links Úteis</h2>
+						
+						<ul>
+							<li><a href="/admin">Painel Administrativo</a></li>
+							<li><a href="/admin/create">Criar Novo Post</a></li>
+							<li><a href="/blog">Ver Blog Público</a></li>
+							<li><a href="/blog/exemplo-formatacao-markdown">Exemplo de Formatação</a></li>
+							<li><a href="/blog/componentes-avancados-markdown">Componentes Avançados</a></li>
+						</ul>
+					</div>
+				</div>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>

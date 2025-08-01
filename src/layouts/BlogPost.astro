@@ -5,6 +5,7 @@ import BaseHead from '../components/BaseHead.astro';
 import Footer from '../components/Footer.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import Header from '../components/Header.astro';
+import MarkdownComponents from '../components/MarkdownComponents.astro';
 
 type Props = CollectionEntry<'blog'>['data'];
 
@@ -35,7 +36,248 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 				margin: auto;
 				padding: 1em;
 				color: rgb(var(--gray-dark));
+				line-height: 1.8;
 			}
+			
+			/* Títulos */
+			.prose h1, .prose h2, .prose h3, .prose h4, .prose h5, .prose h6 {
+				color: rgb(var(--black));
+				font-weight: 700;
+				margin: 2em 0 1em 0;
+				line-height: 1.3;
+			}
+			
+			.prose h1 { 
+				font-size: 2.5em; 
+				border-bottom: 3px solid var(--accent);
+				padding-bottom: 0.5rem;
+			}
+			.prose h2 { 
+				font-size: 2em;
+				border-bottom: 2px solid rgba(var(--gray), 0.3);
+				padding-bottom: 0.3rem;
+			}
+			.prose h3 { font-size: 1.5em; }
+			.prose h4 { font-size: 1.25em; }
+			.prose h5 { font-size: 1.1em; }
+			.prose h6 { font-size: 1em; font-weight: 600; }
+			
+			/* Parágrafos */
+			.prose p {
+				margin: 1.5em 0;
+				line-height: 1.8;
+			}
+			
+			/* Listas */
+			.prose ul, .prose ol {
+				margin: 1.5em 0;
+				padding-left: 2em;
+			}
+			
+			.prose ul {
+				list-style-type: none;
+			}
+			
+			.prose ul li::before {
+				content: "•";
+				color: var(--accent);
+				font-weight: bold;
+				position: absolute;
+				margin-left: -1.5em;
+				font-size: 1.2em;
+			}
+			
+			.prose ol {
+				list-style-type: decimal;
+			}
+			
+			.prose li {
+				margin: 0.5em 0;
+				position: relative;
+			}
+			
+			.prose li ul, .prose li ol {
+				margin: 0.5em 0;
+			}
+			
+			/* Links */
+			.prose a {
+				color: var(--accent);
+				text-decoration: none;
+				border-bottom: 1px solid rgba(var(--accent), 0.3);
+				transition: all 0.3s ease;
+			}
+			
+			.prose a:hover {
+				color: var(--accent-dark);
+				border-bottom-color: var(--accent-dark);
+				background: rgba(var(--accent), 0.1);
+				padding: 0.1em 0.2em;
+				border-radius: 3px;
+			}
+			
+			/* Texto em destaque */
+			.prose strong, .prose b {
+				font-weight: 700;
+				color: rgb(var(--black));
+			}
+			
+			.prose em, .prose i {
+				font-style: italic;
+				color: rgba(var(--gray-dark), 0.9);
+			}
+			
+			/* Código */
+			.prose code {
+				background: rgba(var(--gray-light), 0.8);
+				color: var(--accent-dark);
+				padding: 0.2em 0.4em;
+				border-radius: 4px;
+				font-family: 'SF Mono', 'Monaco', 'Inconsolata', 'Roboto Mono', monospace;
+				font-size: 0.9em;
+				font-weight: 500;
+			}
+			
+			.prose pre {
+				background: rgb(var(--gray-dark));
+				color: rgb(var(--gray-light));
+				padding: 1.5em;
+				border-radius: 8px;
+				overflow-x: auto;
+				margin: 2em 0;
+				box-shadow: var(--box-shadow);
+			}
+			
+			.prose pre code {
+				background: transparent;
+				color: inherit;
+				padding: 0;
+				border-radius: 0;
+				font-size: 0.9em;
+			}
+			
+			/* Blockquotes */
+			.prose blockquote {
+				border-left: 4px solid var(--accent);
+				padding: 1em 0 1em 2em;
+				margin: 2em 0;
+				background: rgba(var(--gray-light), 0.3);
+				border-radius: 0 8px 8px 0;
+				font-style: italic;
+				color: rgba(var(--gray-dark), 0.9);
+			}
+			
+			.prose blockquote p {
+				margin: 0;
+			}
+			
+			.prose blockquote::before {
+				content: """;
+				font-size: 4em;
+				color: var(--accent);
+				position: absolute;
+				margin-left: -0.6em;
+				margin-top: -0.2em;
+				opacity: 0.3;
+			}
+			
+			/* Tabelas */
+			.prose table {
+				width: 100%;
+				border-collapse: collapse;
+				margin: 2em 0;
+				box-shadow: var(--box-shadow);
+				border-radius: 8px;
+				overflow: hidden;
+			}
+			
+			.prose table th {
+				background: var(--accent);
+				color: white;
+				padding: 0.75em 1em;
+				font-weight: 600;
+				text-align: left;
+			}
+			
+			.prose table td {
+				padding: 0.75em 1em;
+				border-bottom: 1px solid rgba(var(--gray), 0.2);
+			}
+			
+			.prose table tbody tr:hover {
+				background: rgba(var(--gray-light), 0.3);
+			}
+			
+			.prose table tbody tr:nth-child(even) {
+				background: rgba(var(--gray-light), 0.1);
+			}
+			
+			/* Linha horizontal */
+			.prose hr {
+				border: none;
+				height: 3px;
+				background: linear-gradient(90deg, transparent, var(--accent), transparent);
+				margin: 3em 0;
+				border-radius: 2px;
+			}
+			
+			/* Imagens */
+			.prose img {
+				max-width: 100%;
+				height: auto;
+				border-radius: 8px;
+				box-shadow: var(--box-shadow);
+				margin: 2em 0;
+				display: block;
+				margin-left: auto;
+				margin-right: auto;
+			}
+			
+			/* Captions para imagens */
+			.prose img + em {
+				display: block;
+				text-align: center;
+				font-size: 0.9em;
+				color: rgba(var(--gray), 0.8);
+				margin-top: -1.5em;
+				margin-bottom: 2em;
+			}
+			
+			/* Elementos de destaque */
+			.prose .highlight {
+				background: linear-gradient(120deg, rgba(var(--accent), 0.2) 0%, rgba(var(--accent), 0.1) 100%);
+				padding: 0.1em 0.3em;
+				border-radius: 3px;
+			}
+			
+			/* Responsive */
+			@media (max-width: 720px) {
+				.prose {
+					padding: 0.5em;
+				}
+				
+				.prose h1 { font-size: 2em; }
+				.prose h2 { font-size: 1.6em; }
+				.prose h3 { font-size: 1.3em; }
+				
+				.prose ul, .prose ol {
+					padding-left: 1.5em;
+				}
+				
+				.prose blockquote {
+					padding: 0.5em 0 0.5em 1.5em;
+				}
+				
+				.prose table {
+					font-size: 0.9em;
+				}
+				
+				.prose table th,
+				.prose table td {
+					padding: 0.5em;
+				}
+			}
+			
 			.title {
 				margin-bottom: 1em;
 				padding: 1em 0;
@@ -82,5 +324,6 @@ const { title, description, pubDate, updatedDate, heroImage } = Astro.props;
 			</article>
 		</main>
 		<Footer />
+		<MarkdownComponents />
 	</body>
 </html>
