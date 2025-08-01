@@ -207,140 +207,133 @@ import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 			<div class="admin-container">
 				<div class="admin-header">
 					<h1 class="admin-title">Criar Novo Post</h1>
-					<div style="display: flex; gap: 0.5rem;">
-						<a href="/admin/editor-guide" class="btn btn-secondary">
-							📖 Guia
-						</a>
-						<a href="/admin" class="btn btn-secondary">
-							← Voltar ao Admin
-						</a>
-					</div>
-				</div>
-
-				<div class="form-container">
-					<div id="message-container"></div>
-
-					<form id="create-form">
-						<div class="form-group">
-							<label for="title" class="form-label"
-								>Título *</label
-							>
-							<input
-								type="text"
-								id="title"
-								name="title"
-								class="form-input"
-								required
-								placeholder="Digite o título do post"
-							/>
-						</div>
-
-						<div class="form-group">
-							<label for="description" class="form-label"
-								>Descrição *</label
-							>
-							<input
-								type="text"
-								id="description"
-								name="description"
-								class="form-input"
-								required
-								placeholder="Breve descrição do post"
-							/>
-							<div class="help-text">
-								Esta descrição aparecerá nas meta tags e
-								listagem de posts
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label for="pubDate" class="form-label"
-								>Data de Publicação *</label
-							>
-							<input
-								type="date"
-								id="pubDate"
-								name="pubDate"
-								class="form-input"
-								required
-							/>
-						</div>
-
-						<div class="form-group">
-							<label for="heroImage" class="form-label"
-								>Imagem de Destaque</label
-							>
-							<div class="image-upload-container">
-								<input
-									type="text"
-									id="heroImage"
-									name="heroImage"
-									class="form-input"
-									placeholder="../../assets/blog-placeholder-1.jpg"
-									readonly
-								/>
-								<div class="upload-section">
-									<input
-										type="file"
-										id="imageUpload"
-										accept="image/jpeg,image/jpg,image/png,image/webp"
-										style="display: none;"
-									/>
-									<button
-										type="button"
-										id="selectImageBtn"
-										class="btn btn-secondary upload-btn"
-									>
-										📁 Selecionar Imagem
-									</button>
-									<span
-										id="uploadStatus"
-										class="upload-status"></span>
-								</div>
-							</div>
-							<div class="help-text">
-								Selecione uma imagem do seu computador (será
-								automaticamente otimizada e convertida para
-								WebP) ou digite o caminho manualmente (opcional)
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label for="content" class="form-label"
-								>Conteúdo *</label
-							>
-
-							<div id="tinymce-container">
-								<textarea
-									id="content"
-									name="content"
-									required
-									placeholder="Digite o conteúdo do post..."
-								></textarea>
-							</div>
-							<div class="help-text">
-								Use a barra de ferramentas do editor para
-								formatação visual. O conteúdo será convertido
-								automaticamente para Markdown.
-							</div>
-						</div>
-
-						<div class="form-actions">
-							<button
-								type="button"
-								id="preview-btn"
-								class="btn btn-secondary"
-							>
-								Visualizar
-							</button>
-							<button type="submit" class="btn btn-primary">
-								Criar Post
-							</button>
-						</div>
-					</form>
+					<a href="/admin" class="btn btn-secondary">
+						← Voltar ao Admin
+					</a>
 				</div>
 			</div>
+
+			<div class="form-container">
+				<div id="message-container"></div>
+
+				<form id="create-form">
+					<div class="form-group">
+						<label for="title" class="form-label">Título *</label>
+						<input
+							type="text"
+							id="title"
+							name="title"
+							class="form-input"
+							required
+							placeholder="Digite o título do post"
+						/>
+					</div>
+
+					<div class="form-group">
+						<label for="description" class="form-label"
+							>Descrição *</label
+						>
+						<input
+							type="text"
+							id="description"
+							name="description"
+							class="form-input"
+							required
+							placeholder="Breve descrição do post"
+						/>
+						<div class="help-text">
+							Esta descrição aparecerá nas meta tags e listagem de
+							posts
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="pubDate" class="form-label"
+							>Data de Publicação *</label
+						>
+						<input
+							type="date"
+							id="pubDate"
+							name="pubDate"
+							class="form-input"
+							required
+						/>
+					</div>
+
+					<div class="form-group">
+						<label for="heroImage" class="form-label"
+							>Imagem de Destaque</label
+						>
+						<div class="image-upload-container">
+							<input
+								type="text"
+								id="heroImage"
+								name="heroImage"
+								class="form-input"
+								placeholder="../../assets/blog-placeholder-1.jpg"
+								readonly
+							/>
+							<div class="upload-section">
+								<input
+									type="file"
+									id="imageUpload"
+									accept="image/jpeg,image/jpg,image/png,image/webp"
+									style="display: none;"
+								/>
+								<button
+									type="button"
+									id="selectImageBtn"
+									class="btn btn-secondary upload-btn"
+								>
+									📁 Selecionar Imagem
+								</button>
+								<span id="uploadStatus" class="upload-status"
+								></span>
+							</div>
+						</div>
+						<div class="help-text">
+							Selecione uma imagem do seu computador (será
+							automaticamente otimizada e convertida para WebP) ou
+							digite o caminho manualmente (opcional)
+						</div>
+					</div>
+
+					<div class="form-group">
+						<label for="content" class="form-label"
+							>Conteúdo *</label
+						>
+
+						<div id="tinymce-container">
+							<textarea
+								id="content"
+								name="content"
+								required
+								placeholder="Digite o conteúdo do post..."
+							></textarea>
+						</div>
+						<div class="help-text">
+							Use a barra de ferramentas do editor para formatação
+							visual. O conteúdo será convertido automaticamente
+							para Markdown.
+						</div>
+					</div>
+
+					<div class="form-actions">
+						<button
+							type="button"
+							id="preview-btn"
+							class="btn btn-secondary"
+						>
+							Visualizar
+						</button>
+						<button type="submit" class="btn btn-primary">
+							Criar Post
+						</button>
+					</div>
+				</form>
+			</div>
 		</main>
+
 		<Footer />
 
 		<script>
