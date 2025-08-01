@@ -2,11 +2,11 @@
 title: 'Post de Teste'
 description: 'Post temporário criado para testes de desenvolvimento'
 pubDate: 'Jan 15, 2024'
-updatedDate: 'Jan 16, 2024'
+updatedDate: 'Aug 1, 2025'
 heroImage: '../../assets/1754052626483-Arte_Tio_Zito.webp'
 ---
 
-# Post de Teste
+# Post de Teste1
 
 Este é um post temporário criado para testes de desenvolvimento.
 
